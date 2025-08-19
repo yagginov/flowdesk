@@ -5,15 +5,19 @@ User = settings.AUTH_USER_MODEL
 
 
 class WorkspaceMember(models.Model):
-    class Roles(models.IntegerChoices):
-        OWNER = 1, "Owner"
-        ADMIN = 2, "Admin"
-        USER = 3, "User"
-        GUEST = 4, "Guest"
+    class Roles(models.TextChoices):
+        OWNER = "OWNER", "Owner"
+        ADMIN = "ADMIN", "Admin"
+        USER = "USER", "User"
+        GUEST = "GUEST", "Guest"
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     workspace = models.ForeignKey("Workspace", on_delete=models.CASCADE)
-    role = models.IntegerField(choices=Roles, default=Roles.GUEST)
+    role = models.CharField(
+        max_length=15,
+        choices=Roles,
+        default=Roles.GUEST
+    )
 
 
 class Workspace(models.Model):
@@ -57,23 +61,45 @@ class Tag(models.Model):
 
 
 class Task(models.Model):
-    class Priority(models.IntegerChoices):
-        LOW = 1, "Low"
-        MEDIUM = 2, "Medium"
-        HIGH = 3, "High"
-        URGENT = 4, "Urgent"
-        CRITICAL = 5, "Critical"
+    class Priority(models.TextChoices):
+        LOW = "LOW", "Low"
+        MEDIUM = "MEDIUM", "Medium"
+        HIGH = "HIGH", "High"
+        URGENT = "URGENT", "Urgent"
+        CRITICAL = "CRITICAL", "Critical"
+
+    class Status(models.TextChoices):
+        TODO = "TODO", "To Do"
+        IN_PROGRESS = "IN_PROGRESS", "In Progress"
+        BLOCKED = "BLOCKED", "Blocked"
+        REVIEW = "REVIEW", "In Review"
+        DONE = "DONE", "Done"
+        ARCHIVED = "ARCHIVED", "Archived"
 
     title = models.CharField(max_length=63)
     description = models.TextField()
-    priority = models.IntegerField(choices=Priority, default=Priority.LOW)
-    is_completed = models.BooleanField(default=False)
+    priority = models.CharField(
+        max_length=15,
+        choices=Priority,
+        default=Priority.LOW
+    )
+    status = models.CharField(
+        max_length=15,
+        choices=Status,
+        default=Status.TODO
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(null=True)
-    list = models.ForeignKey(List, on_delete=models.CASCADE, related_name="tasks")
+    list = models.ForeignKey(
+        List,
+        on_delete=models.CASCADE,
+        related_name="tasks"
+    )
     tags = models.ManyToManyField(Tag, related_name="tasks")
     created_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="created_tasks"
+        User,
+        on_delete=models.CASCADE,
+        related_name="created_tasks"
     )
     members = models.ManyToManyField(User, related_name="tasks")
 
@@ -85,7 +111,7 @@ class Task(models.Model):
         )
 
     def __str__(self) -> str:
-        return f"{self.title} - {self.description[:25]}..."
+        return self.title
 
 
 class Comment(models.Model):
@@ -97,4 +123,4 @@ class Comment(models.Model):
     )
 
     def __str__(self) -> str:
-        return "{self.text[:63]...}"
+        return f"{self.text[:63]}..."
