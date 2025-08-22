@@ -21,7 +21,7 @@ class WorkspaceMember(models.Model):
         on_delete=models.CASCADE,
         related_name="memberships"
     )
-    role = models.CharField(max_length=15, choices=Roles, default=Roles.GUEST)
+    role = models.CharField(max_length=15, choices=Roles.choices, default=Roles.GUEST)
 
 
 class Workspace(models.Model):
@@ -53,6 +53,14 @@ class List(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="lists")
     position = models.IntegerField()
 
+    class Meta:
+        ordering = ("position", )
+        constraints = (
+            models.UniqueConstraint(
+                fields=("board", "position"), name="unique_list_position_per_board"
+            ),
+        )
+
     def __str__(self) -> str:
         return self.name
 
@@ -82,8 +90,8 @@ class Task(models.Model):
 
     title = models.CharField(max_length=63)
     description = models.TextField()
-    priority = models.CharField(max_length=15, choices=Priority, default=Priority.LOW)
-    status = models.CharField(max_length=15, choices=Status, default=Status.TODO)
+    priority = models.CharField(max_length=15, choices=Priority.choices, default=Priority.LOW)
+    status = models.CharField(max_length=15, choices=Status.choices, default=Status.TODO)
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(null=True)
     list = models.ForeignKey(List, on_delete=models.CASCADE, related_name="tasks")

@@ -1,6 +1,6 @@
 body {
-  box-sizing: border-box;
   margin: 0;
+  overflow: hidden;
 }
 
 main {
@@ -9,9 +9,13 @@ main {
 
 #sidebar {
   background: #212529;
-  min-height: 100vh;
+  height: 100%;
   color: #fff;
   width: 260px;
+  position: fixed;
+  z-index: 1; 
+  top: 0;
+  left: 0;
 }
 
 #sidebar .sidebar-title {
@@ -50,4 +54,23 @@ main {
 #sidebar .btn-toggle-nav a:hover, #sidebar .btn-toggle-nav a.active {
   background: #0d6efd;
   color: #fff;
+}
+
+main {
+  margin-left: 260px;
+}
+
+div.lists-wrapper {
+  box-sizing: border-box;
+  width: calc(100vw - 320px);
+  white-space: nowrap;
+  position: relative;
+  overflow-y: hidden;
+  overflow-x: scroll;
+  padding-bottom: 30px;
+}
+
+.card {
+  min-width: 200px;
+  max-width: 200px;
 }
