@@ -1,0 +1,43 @@
+<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3">
+  <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+    <span class="sidebar-title">Flowdesk</span>
+  </a>
+  <hr style="border-color: #343a40;">
+  <ul class="list-unstyled ps-0">
+
+    {% for ws in user_workspaces %}
+      <li class="mb-1">
+        <button class="btn btn-toggle align-items-center rounded collapsed" 
+                data-bs-toggle="collapse" 
+                data-bs-target="#workspace-{{ ws.id }}-collapse" 
+                aria-expanded="false">
+          {{ ws.name }}
+        </button>
+        <div class="collapse" id="workspace-{{ ws.id }}-collapse">
+          <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+            <li><a href="{% url 'flowdesk:workspace-detail' ws.pk %}" class="">Boards</a></li>
+            <li><a href="{% url 'flowdesk:workspace-members' ws.pk %}" class="">Members</a></li>
+          </ul>
+        </div>
+      </li>
+    {% empty %}
+      <li class="mb-1 text-muted ps-2">No workspaces yet</li>
+    {% endfor %}
+
+    <li class="mb-1">
+      <button class="btn btn-toggle align-items-center rounded collapsed" 
+              data-bs-toggle="collapse" 
+              data-bs-target="#account-collapse" 
+              aria-expanded="false">
+        Account
+      </button>
+      <div class="collapse" id="account-collapse">
+        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+          <li><a href="#" class="">Profile</a></li>
+          <li><a href="#" class="">Settings</a></li>
+          <li><a href="#" class="">Sign out</a></li>
+        </ul>
+      </div>
+    </li>
+  </ul>
+</div>

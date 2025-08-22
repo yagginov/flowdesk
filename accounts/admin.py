@@ -6,9 +6,9 @@ from accounts.models import User, Position
 
 @admin.register(User)
 class UserAdmin(UserAdmin):
-    list_display = UserAdmin.list_display + ("position", )
+    list_display = UserAdmin.list_display + ("position",)
 
 
 @admin.register(Position)
 class PositionAdmin(admin.ModelAdmin):
-    list_display = ("name", )
+    list_display = ("name",)

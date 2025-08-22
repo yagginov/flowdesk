@@ -11,13 +11,17 @@ class WorkspaceMember(models.Model):
         USER = "USER", "User"
         GUEST = "GUEST", "Guest"
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    workspace = models.ForeignKey("Workspace", on_delete=models.CASCADE)
-    role = models.CharField(
-        max_length=15,
-        choices=Roles,
-        default=Roles.GUEST
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="workspace_memberships"
     )
+    workspace = models.ForeignKey(
+        "Workspace",
+        on_delete=models.CASCADE,
+        related_name="memberships"
+    )
+    role = models.CharField(max_length=15, choices=Roles, default=Roles.GUEST)
 
 
 class Workspace(models.Model):
@@ -78,30 +82,17 @@ class Task(models.Model):
 
     title = models.CharField(max_length=63)
     description = models.TextField()
-    priority = models.CharField(
-        max_length=15,
-        choices=Priority,
-        default=Priority.LOW
-    )
-    status = models.CharField(
-        max_length=15,
-        choices=Status,
-        default=Status.TODO
-    )
+    priority = models.CharField(max_length=15, choices=Priority, default=Priority.LOW)
+    status = models.CharField(max_length=15, choices=Status, default=Status.TODO)
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(null=True)
-    list = models.ForeignKey(
-        List,
-        on_delete=models.CASCADE,
-        related_name="tasks"
-    )
+    list = models.ForeignKey(List, on_delete=models.CASCADE, related_name="tasks")
     tags = models.ManyToManyField(Tag, related_name="tasks")
     created_by = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="created_tasks"
+        User, on_delete=models.CASCADE, related_name="created_tasks"
     )
     members = models.ManyToManyField(User, related_name="tasks")
+    position = models.IntegerField()
 
     class Meta:
         ordering = (
@@ -121,6 +112,9 @@ class Comment(models.Model):
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="comments"
     )
+
+    class Meta:
+        ordering = ("-created_at",)
 
     def __str__(self) -> str:
         return f"{self.text[:63]}..."

@@ -11,10 +11,7 @@ class Position(models.Model):
 
 class User(AbstractUser):
     position = models.ForeignKey(
-        Position,
-        on_delete=models.CASCADE,
-        related_name="users",
-        null=True
+        Position, on_delete=models.CASCADE, related_name="users", null=True
     )
 
     def __str__(self) -> str:

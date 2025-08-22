@@ -6,27 +6,57 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flowdesk', '0001_initial'),
+        ("flowdesk", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='task',
-            name='is_completed',
+            model_name="task",
+            name="is_completed",
         ),
         migrations.AddField(
-            model_name='task',
-            name='status',
-            field=models.CharField(choices=[('TODO', 'To Do'), ('IN_PROGRESS', 'In Progress'), ('BLOCKED', 'Blocked'), ('REVIEW', 'In Review'), ('DONE', 'Done'), ('ARCHIVED', 'Archived')], default='TODO', max_length=15),
+            model_name="task",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("TODO", "To Do"),
+                    ("IN_PROGRESS", "In Progress"),
+                    ("BLOCKED", "Blocked"),
+                    ("REVIEW", "In Review"),
+                    ("DONE", "Done"),
+                    ("ARCHIVED", "Archived"),
+                ],
+                default="TODO",
+                max_length=15,
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='priority',
-            field=models.CharField(choices=[('LOW', 'Low'), ('MEDIUM', 'Medium'), ('HIGH', 'High'), ('URGENT', 'Urgent'), ('CRITICAL', 'Critical')], default='LOW', max_length=15),
+            model_name="task",
+            name="priority",
+            field=models.CharField(
+                choices=[
+                    ("LOW", "Low"),
+                    ("MEDIUM", "Medium"),
+                    ("HIGH", "High"),
+                    ("URGENT", "Urgent"),
+                    ("CRITICAL", "Critical"),
+                ],
+                default="LOW",
+                max_length=15,
+            ),
         ),
         migrations.AlterField(
-            model_name='workspacemember',
-            name='role',
-            field=models.CharField(choices=[('OWNER', 'Owner'), ('ADMIN', 'Admin'), ('USER', 'User'), ('GUEST', 'Guest')], default='GUEST', max_length=15),
+            model_name="workspacemember",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("OWNER", "Owner"),
+                    ("ADMIN", "Admin"),
+                    ("USER", "User"),
+                    ("GUEST", "Guest"),
+                ],
+                default="GUEST",
+                max_length=15,
+            ),
         ),
     ]

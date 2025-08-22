@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">{{ workspace.name }} - Members</h2>
+
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Position</th>
+        <th scope="col">Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for member in workspace.memberships.all %}
+        <tr>
+          <td>{{ member.user.username }}</td>
+          <td>{{ member.user.position.name }}</td>
+          <td>{{ member.get_role_display }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="3" class="text-center text-muted">No members yet</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

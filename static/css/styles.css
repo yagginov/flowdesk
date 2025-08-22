@@ -1,0 +1,53 @@
+body {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+main {
+  padding: 20px;
+}
+
+#sidebar {
+  background: #212529;
+  min-height: 100vh;
+  color: #fff;
+  width: 260px;
+}
+
+#sidebar .sidebar-title {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #0d6efd;
+  letter-spacing: 1px;
+}
+
+#sidebar .btn-toggle {
+  color: #fff;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-weight: 500;
+  border: none;
+  padding: 0.75rem 1rem;
+  transition: background 0.2s;
+}
+
+#sidebar .btn-toggle[aria-expanded="true"],
+#sidebar .btn-toggle:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+#sidebar .btn-toggle-nav a {
+  color: #adb5bd;
+  padding: 0.5rem 2rem;
+  display: block;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+#sidebar .btn-toggle-nav a:hover, #sidebar .btn-toggle-nav a.active {
+  background: #0d6efd;
+  color: #fff;
+}
