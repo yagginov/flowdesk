@@ -4,32 +4,38 @@
 <div class="container-fluid mt-4">
   <h2 class="mb-4">{{ board.name }}</h2>
   <div class="lists-wrapper">
-    <div class="d-flex flex-row gap-3 pb-3">
-      {% for list in board.lists.all %}
-        <div class="card shadow-sm border-0">
-          <div class="card-body">
-            <h5 class="card-title">{{ list.name }}</h5>
-            <hr>
-            <div class="list-tasks">
-              {% for task in list.tasks.all %}
-                <div class="card mb-2 border-0 shadow-sm">
-                  <div class="card-body py-2 px-3">
-                    {{ task.content }}
+    <div class="lists-scroll" id="lists-scroll">
+      <div class="d-flex flex-row gap-3 pb-3">
+        {% for list in board.lists.all %}
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <h5 class="card-title">{{ list.name }}</h5>
+              <hr>
+              <div class="list-tasks">
+                {% for task in list.tasks.all %}
+                  <div class="card mb-2 border-0 shadow-sm">
+                    <div class="card-body py-2 px-3">
+                      {{ task.content }}
+                    </div>
                   </div>
-                </div>
-              {% empty %}
-                <p class="text-muted small">No tasks</p>
-              {% endfor %}
+                {% empty %}
+                  <p class="text-muted small">No tasks</p>
+                {% endfor %}
+              </div>
             </div>
           </div>
-        </div>
-      {% endfor %}
-      <div class="card shadow-sm border-0 d-flex align-items-center justify-content-center">
-        <div class="card-body text-center">
-          <a href="{% url 'flowdesk:list-create' board.pk %}" class="btn btn-outline-primary w-100">+ Create new list</a>
+        {% endfor %}
+        <div class="card shadow-sm border-0 d-flex align-items-center justify-content-center">
+          <div class="card-body text-center">
+            <a href="{% url 'flowdesk:list-create' board.pk %}" class="btn btn-outline-primary w-100">+ Create new list</a>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </div>
+<input type="range" class="lists-scrollbar" id="lists-scrollbar">
+{% load static %}
+<script src="{% static 'js/lists_scroll.js' %}"></script>
 {% endblock %}
