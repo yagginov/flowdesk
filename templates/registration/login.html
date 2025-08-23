@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
   <div style="width: 300px;">
     <h1 class="text-center mb-4">Login</h1>
     <form method="post" action="">
