@@ -60,11 +60,10 @@ main {
   margin-left: 260px;
 }
 
-.card {
+.card-list {
   min-width: 200px;
   max-width: 200px;
 }
-
 
 .lists-wrapper {
   width: calc(100vw - 320px);
@@ -89,17 +88,17 @@ main {
   left: 280px;
   width: calc(100vw - 300px);
   appearance: none;
-  height: 20px;
+  height: 15px;
   background: #dee2e6;
-  border-radius: 4px;
+  border-radius: 15px;
   z-index: 1000;
 }
 
 .lists-scrollbar::-webkit-slider-thumb {
   appearance: none;
   width: var(--thumb-width);
-  height: 20px;
+  height: 15px;
   background: #0d6efd;
-  border-radius: 4px;
+  border-radius: 15px;
   cursor: grab;
 }

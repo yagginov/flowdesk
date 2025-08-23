@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-  <h2 class="mb-4">{{ workspace.name }} - Boards</h2>
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">{{ workspace.name }} – Boards</h2>
 
   <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for board in workspace.boards.all %}
       <div class="col">
         <div class="card h-100 shadow-sm border-0">
-          <div class="card-body d-flex flex-column justify-content-between">
+          <div class="card-body">
             <h5 class="card-title">{{ board.name }}</h5>
             <a href="{% url 'flowdesk:board-detail' board.pk %}" class="stretched-link"></a>
           </div>
@@ -18,9 +18,8 @@
 
     <div class="col">
       <div class="card h-100 shadow-sm border-0 text-center d-flex align-items-center justify-content-center">
-        <div class="card-body">
-          <a href="{% url 'flowdesk:board-create' workspace.pk %}" class="btn btn-outline-primary">+ Create new board</a>
-        </div>
+        <h5 class="card-title text-muted">+ Create new board</h5>
+        <a href="{% url 'flowdesk:board-create' workspace.pk %}" class="stretched-link"></a>
       </div>
     </div>
   </div>
