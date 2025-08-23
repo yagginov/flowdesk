@@ -2,7 +2,7 @@ from django.http import HttpRequest, HttpResponse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.db.models import Max
 
 
@@ -15,7 +15,7 @@ from flowdesk.models import (
 from flowdesk.forms import (
     WorkspaceForm,
     BoardForm,
-    ListForm
+    ListForm,
 )
 
 
@@ -63,7 +63,9 @@ class WorkspaceCreateView(LoginRequiredMixin, generic.CreateView):
 class BoardCreateView(LoginRequiredMixin, generic.CreateView):
     model = Board
     form_class = BoardForm
-    success_url = reverse_lazy("flowdesk:index")
+
+    def get_success_url(self):
+        return reverse("flowdesk:workspace-detail", args=(self.kwargs["workspace_pk"], ))
 
     def form_valid(self, form: BoardForm) -> HttpResponse:
         workspace = get_object_or_404(Workspace, pk=self.kwargs["workspace_pk"])
@@ -74,7 +76,9 @@ class BoardCreateView(LoginRequiredMixin, generic.CreateView):
 class ListCreateView(LoginRequiredMixin, generic.CreateView):
     model = List
     form_class = ListForm
-    success_url = reverse_lazy("flowdesk:index")
+
+    def get_success_url(self):
+        return reverse("flowdesk:board-detail", args=(self.kwargs["board_pk"], ))
 
     def form_valid(self, form: ListForm) -> HttpResponse:
         board = get_object_or_404(Board, pk=self.kwargs["board_pk"])

@@ -30,6 +30,6 @@ urlpatterns = [
         "boards/<int:pk>/", BoardDetailView.as_view(), name="board-detail"
     ),
     path(
-        "boards/<int:board_pk>/lists/create", ListCreateView.as_view(), name="list-create"
+        "boards/<int:board_pk>/lists/create/", ListCreateView.as_view(), name="list-create"
     ),
 ]
