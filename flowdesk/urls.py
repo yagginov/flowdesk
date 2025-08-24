@@ -8,6 +8,7 @@ from flowdesk.views import (
     BoardDetailView,
     BoardCreateView,
     ListCreateView,
+    TaskCreateView,
 )
 
 app_name = "flowdesk"
@@ -31,5 +32,8 @@ urlpatterns = [
     ),
     path(
         "boards/<int:board_pk>/lists/create/", ListCreateView.as_view(), name="list-create"
+    ),
+    path(
+        "lists/<int:list_pk>/tasks/create/", TaskCreateView.as_view(), name="task-create"
     ),
 ]

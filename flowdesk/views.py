@@ -3,7 +3,7 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.db.models import Max
+from django.db.models import Max, QuerySet
 
 
 from flowdesk.models import (
@@ -11,11 +11,13 @@ from flowdesk.models import (
     Workspace,
     WorkspaceMember,
     List,
+    Task,
 )
 from flowdesk.forms import (
     WorkspaceForm,
     BoardForm,
     ListForm,
+    TaskForm,
 )
 
 
@@ -28,19 +30,37 @@ class WorkspaceDetailView(LoginRequiredMixin, generic.DetailView):
     queryset = Workspace.objects.prefetch_related("boards")
     template_name = "flowdesk/workspace_detail.html"
 
+    def get_queryset(self) -> QuerySet:
+        queryset = Workspace.objects.filter(
+            members=self.request.user.pk
+        ).prefetch_related(
+            "boards"
+        )
+        return queryset
+
 
 class WorkspaceMembersView(LoginRequiredMixin, generic.DetailView):
     model = Workspace
-    queryset = Workspace.objects.prefetch_related(
-        "memberships__user__position"
-    )
     template_name = "flowdesk/workspace_members.html"
+
+    def get_queryset(self) -> QuerySet:
+        return Workspace.objects.filter(
+            members=self.request.user.pk
+        ).prefetch_related(
+            "memberships__user__position"
+        )
 
 
 class BoardDetailView(LoginRequiredMixin, generic.DetailView):
     model = Board
-    queryset = Board.objects.prefetch_related("lists")
     template_name = "flowdesk/board_detail.html"
+
+    def get_queryset(self) -> QuerySet:
+        return Board.objects.filter(
+            workspace__members=self.request.user.pk
+        ).prefetch_related(
+            "lists"
+        )
 
 
 class WorkspaceCreateView(LoginRequiredMixin, generic.CreateView):
@@ -85,5 +105,29 @@ class ListCreateView(LoginRequiredMixin, generic.CreateView):
         form.instance.board = board
 
         last_position = board.lists.aggregate(Max("position"))["position__max"]
+        form.instance.position = (last_position or 0) + 1
+        return super().form_valid(form)
+
+
+class TaskCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Task
+    form_class = TaskForm
+
+    def get_success_url(self):
+        list = get_object_or_404(List, pk=self.kwargs["list_pk"])
+        return reverse("flowdesk:board-detail", args=(list.board_id, ))
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        list_obj = get_object_or_404(List, pk=self.kwargs["list_pk"])
+        kwargs["workspace"] = list_obj.board.workspace
+        return kwargs
+
+    def form_valid(self, form: TaskForm) -> HttpResponse:
+        list = get_object_or_404(List, pk=self.kwargs["list_pk"])
+        form.instance.list = list
+        form.instance.created_by = self.request.user
+
+        last_position = list.tasks.aggregate(Max("position"))["position__max"]
         form.instance.position = (last_position or 0) + 1
         return super().form_valid(form)

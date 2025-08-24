@@ -14,15 +14,22 @@
             {% for task in list.tasks.all %}
               <div class="card mb-2 border-0 shadow-sm">
                 <div class="card-body py-2 px-3">
-                  {{ task.content }}
+                  {{ task.title }}
                 </div>
               </div>
             {% empty %}
               <p class="text-muted small">No tasks</p>
             {% endfor %}
+
+            <div class="mt-2 text-center">
+              <a href="{% url 'flowdesk:task-create' list.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                + Add task
+              </a>
+            </div>
           </div>
         </div>
       {% endfor %}
+
 
       <div class="card card-list shadow-sm border-0 text-center d-flex align-items-center justify-content-center">
         <h5 class="card-title text-muted">+ Create new list</h5>

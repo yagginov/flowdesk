@@ -9,10 +9,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = os.getenv("DEBUG", False)
+ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = []
+debug_str = os.getenv("DEBUG")
+DEBUG = debug_str== "True" if debug_str else False
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
 
 # Application definition
 
@@ -54,6 +58,9 @@ TEMPLATES = [
         },
     },
 ]
+
+MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
+
 
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -109,4 +116,31 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 AUTH_USER_MODEL = "accounts.User"
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "flowdesk:index"
+
+# email
+EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+
+
+MEDIA_ROOT = BASE_DIR / "media/"
+MEDIA_URL = "media/"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "base.storages.WindowsCompatibleDropboxStorage",
+        "OPTIONS": {
+            "oauth2_access_token": os.getenv("DROPBOX_OAUTH2_TOKEN"),
+            "oauth2_refresh_token": os.getenv("DROPBOX_OAUTH2_REFRESH_TOKEN"),
+            "app_secret": os.getenv("DROPBOX_APP_SECRET"),
+            "app_key": os.getenv("DROPBOX_APP_KEY"),
+            "root_path": "media/",
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
