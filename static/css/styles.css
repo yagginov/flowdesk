@@ -60,9 +60,10 @@ main {
   margin-left: 260px;
 }
 
-.card-list {
+.card.card-list {
   min-width: 200px;
   max-width: 200px;
+  flex: 0 0 auto;
 }
 
 .lists-wrapper {
@@ -75,6 +76,7 @@ main {
   overflow-y: hidden;
   white-space: nowrap;
   scrollbar-width: none;
+  align-items: flex-start;
 }
 
 .lists-scroll::-webkit-scrollbar {
