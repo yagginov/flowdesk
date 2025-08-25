@@ -6,6 +6,8 @@ from flowdesk.views import (
     WorkspaceMembersView,
     WorkspaceTagsView,
     WorkspaceCreateView,
+    WorkspaceUpdateView,
+    WorkspaceDeleteView,
     TagCreateView,
     TagUpdateView,
     TagDeleteView,
@@ -42,6 +44,16 @@ urlpatterns = [
         name="workspace-tags",
     ),
     path("workspaces/create/", WorkspaceCreateView.as_view(), name="workspace-create"),
+    path(
+        "workspaces/<int:pk>/update/",
+        WorkspaceUpdateView.as_view(),
+        name="workspace-update"
+    ),
+    path(
+        "workspaces/<int:pk>/delete/",
+        WorkspaceDeleteView.as_view(),
+        name="workspace-delete"
+    ),
     path(
         "workspaces/<int:workspace_pk>/tags/create/",
         TagCreateView.as_view(),

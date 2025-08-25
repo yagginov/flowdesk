@@ -7,10 +7,11 @@
   <ul class="list-unstyled ps-0">
     <li class="mb-1">
       <button class="btn btn-toggle align-items-center rounded collapsed" 
-              data-bs-toggle="collapse" 
-              data-bs-target="#account-collapse" 
-              aria-expanded="false">
-        Account
+          data-bs-toggle="collapse" 
+          data-bs-target="#account-collapse" 
+          aria-expanded="false">
+        <i class="bi bi-person-circle"></i>
+        <span>Account</span>
       </button>
       <div class="collapse" id="account-collapse">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
@@ -40,13 +41,27 @@
                   data-bs-toggle="collapse" 
                   data-bs-target="#workspace-{{ ws.id }}-collapse" 
                   aria-expanded="false">
-            {{ ws.name }}
+            <i class="bi bi-box-seam"></i>
+            <span>{{ ws.name }}</span>
           </button>
           <div class="collapse" id="workspace-{{ ws.id }}-collapse">
             <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-              <li><a href="{% url 'flowdesk:workspace-detail' ws.pk %}" class="">Boards</a></li>
-              <li><a href="{% url 'flowdesk:workspace-members' ws.pk %}" class="">Members</a></li>
-              <li><a href="{% url 'flowdesk:workspace-tags' ws.pk %}" class="">Task tags</a></li>
+              <li><a href="{% url 'flowdesk:workspace-detail' ws.pk %}" class="">
+                <i class="bi bi-kanban"></i>
+                <span>Boards</span>
+              </a></li>
+              <li><a href="{% url 'flowdesk:workspace-members' ws.pk %}" class="">
+                <i class="bi bi-people"></i>
+                <span>Members</span>
+              </a></li>
+              <li><a href="{% url 'flowdesk:workspace-tags' ws.pk %}" class="">
+                <i class="bi bi-bookmarks"></i>
+                <span>Task tags</span>
+              </a></li>
+              <li><a href="{% url 'flowdesk:workspace-update' ws.pk %}" class="">
+                <i class="bi bi-gear"></i>
+                <span>Settings</span>
+              </a></li>
             </ul>
           </div>
         </li>

@@ -5,10 +5,22 @@
 <div class="container mt-5 d-flex justify-content-center">
   <div class="col-md-8 col-lg-6">
     <div class="card shadow-sm border-0">
-      <div class="card-body">
-        <h3 class="card-title mb-4">
-          {% if form.instance.pk %}Edit{% else %}Create{% endif %} Workspace
+      <h3 class="card-header d-flex justify-content-between align-items-center">
+          <span>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Workspace</span>
+          <span>
+            <form method="post"
+                  action="{% url 'flowdesk:workspace-delete' workspace.pk %}"
+                  style="display:inline;">
+              {% csrf_token %}
+              <button type="submit"
+                      class="btn btn-sm btn-danger"
+                      onclick="return confirm('Are you sure you want to delete this workspace?');">
+                <i class="bi bi-trash3-fill"></i>
+              </button>
+            </form>
+          </span>
         </h3>
+      <div class="card-body">
 
         <form method="post">
           {% csrf_token %}

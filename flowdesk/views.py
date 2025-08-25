@@ -72,6 +72,17 @@ class WorkspaceCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
 
 
+class WorkspaceUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+    model = Workspace
+    form_class = WorkspaceForm
+    success_url = reverse_lazy("flowdesk:index")
+
+
+class WorkspaceDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+    model = Workspace
+    success_url = reverse_lazy("flowdesk:index")
+
+
 class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
     model = Board
 
