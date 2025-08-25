@@ -10,7 +10,7 @@
         <div class="card h-100 shadow-sm border-0">
           <div class="card-body">
             <h5 class="card-title">{{ board.name }}</h5>
-            <a href="{% url 'flowdesk:board-detail' board.pk %}" class="stretched-link"></a>
+            <a href="{% url 'flowdesk:board-detail' workspace.pk board.pk %}" class="stretched-link"></a>
           </div>
         </div>
       </div>

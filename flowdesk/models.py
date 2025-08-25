@@ -111,7 +111,7 @@ class Task(LogerBaseModel):
     )
     assigned_to = models.ManyToManyField(User, related_name="tasks", blank=True)
     position = models.IntegerField()
-    blocking_tasks = models.ManyToManyField("Task", related_name="tasks")
+    blocking_tasks = models.ManyToManyField("Task", related_name="tasks", blank=True)
 
     class Meta:
         ordering = ("position",)

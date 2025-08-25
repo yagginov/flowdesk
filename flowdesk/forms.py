@@ -61,6 +61,7 @@ class TaskForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if workspace:
             self.fields["assigned_to"].queryset = workspace.members.all()
+            self.fields["tags"].queryset = workspace.tags.all()
         if board:
             self.fields["blocking_tasks"].queryset = Task.objects.filter(
                 list__board=board

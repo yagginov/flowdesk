@@ -24,7 +24,7 @@
 
           </div>
           <div class="mt-2 text-center add-task-btn">
-            <a href="{% url 'flowdesk:task-create' list.pk %}" class="btn btn-sm btn-outline-primary w-100">
+            <a href="{% url 'flowdesk:task-create' board.workspace.pk board.pk list.pk %}" class="btn btn-sm btn-outline-primary w-100">
               + Add task
             </a>
           </div>
@@ -34,7 +34,7 @@
 
       <div class="card card-list shadow-sm border-0 text-center d-flex align-items-center justify-content-center no-drag">
         <h5 class="card-title text-muted">+ Create new list</h5>
-        <a href="{% url 'flowdesk:list-create' board.pk %}" class="stretched-link"></a>
+        <a href="{% url 'flowdesk:list-create' board.workspace.pk board.pk %}" class="stretched-link"></a>
       </div>
 
     </div>
@@ -45,8 +45,8 @@
 
 {% load static %}
 <script>
-  window.updateListOrderUrl = "{% url 'flowdesk:update-list-order' board.pk %}";
-  window.updateTaskOrderUrl = "{% url 'flowdesk:update-task-order' board.pk %}";
+  window.updateListOrderUrl = "{% url 'flowdesk:update-list-order' board.workspace.pk board.pk %}";
+  window.updateTaskOrderUrl = "{% url 'flowdesk:update-task-order' board.workspace.pk board.pk %}";
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="{% static 'js/dragndrop.js' %}"></script>
