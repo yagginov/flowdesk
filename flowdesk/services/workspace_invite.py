@@ -20,7 +20,7 @@ def generate_invite_link(request, workspace, invited_user):
         reverse(
             "flowdesk:workspace-join",
             kwargs={
-                "workspace_id": workspace.pk,
+                "pk": workspace.pk,
                 "uidb64": uid,
                 "token": token,
             },

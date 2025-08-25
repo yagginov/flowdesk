@@ -30,7 +30,13 @@ from flowdesk.forms import (
     CommentForm,
     WorkspaceMemberFormSet
 )
-from flowdesk.mixins import WorkspaceAccessMixin, AdminRequiredMixin, UserRequiredMixin
+from flowdesk.mixins import (
+    WorkspaceAccessMixin,
+    OwnerRequiredMixin,
+    AdminRequiredMixin,
+    UserRequiredMixin,
+    GuestRequiredMixin
+)
 from flowdesk.services.workspace_invite import generate_invite_link, workspace_invite_token
 
 User = get_user_model()
@@ -40,7 +46,7 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
     template_name = "flowdesk/index.html"
 
 
-class WorkspaceDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
+class WorkspaceDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
     model = Workspace
     template_name = "flowdesk/workspace_detail.html"
 
@@ -48,7 +54,7 @@ class WorkspaceDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.Deta
         return Workspace.objects.prefetch_related("boards")
 
 
-class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
+class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
     model = Workspace
     template_name = "flowdesk/workspace_members.html"
 
@@ -74,17 +80,16 @@ class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, generic.Det
         return redirect("flowdesk:workspace-members", pk=workspace.id)
 
 
-class WorkspaceInviteView(LoginRequiredMixin, generic.DetailView):
+class WorkspaceInviteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DetailView):
     model = Workspace
     template_name = "flowdesk/invite_link.html"
-    pk_url_kwarg = "workspace_id"
+    pk_url_kwarg = "pk"
     context_object_name = "workspace"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        workspace = self.get_object()
 
-        if not workspace.memberships.filter(
+        if not self.workspace.memberships.filter(
             user=self.request.user,
             role__in=[WorkspaceMember.Roles.OWNER, WorkspaceMember.Roles.ADMIN],
         ).exists():
@@ -94,7 +99,7 @@ class WorkspaceInviteView(LoginRequiredMixin, generic.DetailView):
             context["invite_link"] = None
         else:
             context["invite_link"] = generate_invite_link(
-                self.request, workspace, self.request.user
+                self.request, self.workspace, self.request.user
             )
         return context
 
@@ -103,7 +108,7 @@ class WorkspaceJoinView(LoginRequiredMixin, generic.RedirectView):
     permanent = False
 
     def get_redirect_url(self, *args, **kwargs):
-        workspace_id = kwargs.get("workspace_id")
+        workspace_id = kwargs.get("pk")
         uidb64 = kwargs.get("uidb64")
         token = kwargs.get("token")
 
@@ -129,13 +134,13 @@ class WorkspaceJoinView(LoginRequiredMixin, generic.RedirectView):
                 messages.info(
                     self.request, f"You are already a member of {workspace.name}."
                 )
-            return reverse("flowdesk:workspace-members", kwargs={"pk": workspace.id})
+            return reverse("flowdesk:workspace-members", kwargs={"pk": workspace.pk})
 
         messages.error(self.request, "Invalid or expired invitation link.")
         return reverse("flowdesk:index")
 
 
-class WorkspaceTagsView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
+class WorkspaceTagsView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
     model = Workspace
     template_name = "flowdesk/workspace_tags.html"
 
@@ -164,7 +169,7 @@ class WorkspaceUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequire
     success_url = reverse_lazy("flowdesk:index")
 
 
-class WorkspaceDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
+class WorkspaceDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, OwnerRequiredMixin, generic.DeleteView):
     model = Workspace
     success_url = reverse_lazy("flowdesk:index")
 
@@ -203,7 +208,7 @@ class TagDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin
         return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
 
 
-class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
+class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
     model = Board
 
     def get_queryset(self) -> QuerySet:
@@ -302,7 +307,7 @@ class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMix
         return HttpResponse(status=204)
 
 
-class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
+class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
     model = Task
     context_object_name = "task"
     template_name = "flowdesk/task_detail.html"

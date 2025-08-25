@@ -58,12 +58,12 @@ urlpatterns = [
         name="workspace-delete",
     ),
     path(
-        "workspaces/<int:workspace_id>/invite/",
+        "workspaces/<int:pk>/invite/",
         WorkspaceInviteView.as_view(),
         name="workspace-invite",
     ),
     path(
-        "workspaces/<int:workspace_id>/join/<uidb64>/<token>/",
+        "workspaces/<int:pk>/join/<uidb64>/<token>/",
         WorkspaceJoinView.as_view(),
         name="workspace-join",
     ),

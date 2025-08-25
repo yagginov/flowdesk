@@ -2,8 +2,8 @@ from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from flowdesk.models import Workspace, Board, List, Task, Tag
 
-
 from flowdesk.models import WorkspaceMember
+
 
 class RoleRequiredMixin:
     required_role = None
