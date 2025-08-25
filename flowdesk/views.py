@@ -8,7 +8,7 @@ from django.db.models import Max, QuerySet
 from django.db import IntegrityError
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth import get_user_model
 
@@ -28,9 +28,13 @@ from flowdesk.forms import (
     TaskForm,
     TagForm,
     CommentForm,
+    WorkspaceMemberFormSet
 )
 from flowdesk.mixins import WorkspaceAccessMixin
-from flowdesk.services.workspace_invite import generate_invite_link, workspace_invite_token
+from flowdesk.services.workspace_invite import (
+    generate_invite_link,
+    workspace_invite_token,
+)
 
 User = get_user_model()
 
@@ -47,14 +51,30 @@ class WorkspaceDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.Deta
         return Workspace.objects.prefetch_related("boards")
 
 
-class WorkspaceMembersView(
-    LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView
-):
+class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
     model = Workspace
     template_name = "flowdesk/workspace_members.html"
 
-    def get_queryset(self) -> QuerySet:
+    def get_queryset(self):
         return Workspace.objects.prefetch_related("memberships__user__profile")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        workspace = self.get_object()
+        context['formset'] = WorkspaceMemberFormSet(queryset=workspace.memberships.all())
+        return context
+
+    def post(self, request, *args, **kwargs):
+        workspace = self.get_object()
+        formset = WorkspaceMemberFormSet(request.POST, queryset=workspace.memberships.all())
+
+        if formset.is_valid():
+            formset.save()
+            messages.success(request, "Roles updated successfully.")
+        else:
+            messages.error(request, "There was a problem updating roles.")
+
+        return redirect("flowdesk:workspace-members", pk=workspace.id)
 
 
 class WorkspaceInviteView(LoginRequiredMixin, generic.DetailView):
@@ -69,12 +89,16 @@ class WorkspaceInviteView(LoginRequiredMixin, generic.DetailView):
 
         if not workspace.memberships.filter(
             user=self.request.user,
-            role__in=[WorkspaceMember.Roles.OWNER, WorkspaceMember.Roles.ADMIN]
+            role__in=[WorkspaceMember.Roles.OWNER, WorkspaceMember.Roles.ADMIN],
         ).exists():
-            messages.error(self.request, "You do not have permission to generate invites.")
+            messages.error(
+                self.request, "You do not have permission to generate invites."
+            )
             context["invite_link"] = None
         else:
-            context["invite_link"] = generate_invite_link(self.request, workspace, self.request.user)
+            context["invite_link"] = generate_invite_link(
+                self.request, workspace, self.request.user
+            )
         return context
 
 
@@ -101,9 +125,13 @@ class WorkspaceJoinView(LoginRequiredMixin, generic.RedirectView):
                 defaults={"role": WorkspaceMember.Roles.GUEST},
             )
             if created:
-                messages.success(self.request, f"You have joined {workspace.name} as Guest.")
+                messages.success(
+                    self.request, f"You have joined {workspace.name} as Guest."
+                )
             else:
-                messages.info(self.request, f"You are already a member of {workspace.name}.")
+                messages.info(
+                    self.request, f"You are already a member of {workspace.name}."
+                )
             return reverse("flowdesk:workspace-members", kwargs={"pk": workspace.id})
 
         messages.error(self.request, "Invalid or expired invitation link.")

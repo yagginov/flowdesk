@@ -17,10 +17,13 @@ def generate_invite_link(request, workspace, invited_user):
     uid = urlsafe_base64_encode(force_bytes(invited_user.pk))
 
     link = request.build_absolute_uri(
-        reverse("flowdesk:workspace-join", kwargs={
-            "workspace_id": workspace.pk,
-            "uidb64": uid,
-            "token": token,
-        })
+        reverse(
+            "flowdesk:workspace-join",
+            kwargs={
+                "workspace_id": workspace.pk,
+                "uidb64": uid,
+                "token": token,
+            },
+        )
     )
     return link

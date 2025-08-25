@@ -1,7 +1,16 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.forms import modelformset_factory
 
-from flowdesk.models import Workspace, Board, List, Task, Tag, Comment
+from flowdesk.models import (
+    Workspace,
+    Board,
+    List,
+    Task,
+    Tag,
+    Comment,
+    WorkspaceMember
+)
 
 User = get_user_model()
 
@@ -84,3 +93,15 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ("text",)
+
+
+class WorkspaceMemberForm(forms.ModelForm):
+    class Meta:
+        model = WorkspaceMember
+        fields = ("role", )
+        widgets = {"role": forms.Select(attrs={"class": "form-select"})}
+
+
+WorkspaceMemberFormSet = modelformset_factory(
+    WorkspaceMember, form=WorkspaceMemberForm, extra=0
+)

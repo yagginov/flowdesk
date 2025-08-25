@@ -14,7 +14,7 @@ class Profile(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
     )
     avatar = VersatileImageField(
-        "Avatar", upload_to="accounts/profiles/avatars/", blank=True, null=True
+        "avatar", upload_to="accounts/profiles/avatars/", blank=True, null=True
     )
     position = models.CharField(max_length=63)
 

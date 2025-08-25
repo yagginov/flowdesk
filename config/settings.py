@@ -38,15 +38,6 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
-VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
-    "avatar": [
-        ("thumbnail", "crop__32x32"),
-        ("medium", "crop__128x128"),
-        ("large", "crop__300x300"),
-    ],
-}
-
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
