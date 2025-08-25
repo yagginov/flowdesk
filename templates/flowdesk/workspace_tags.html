@@ -4,7 +4,7 @@
 <div class="container mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="mb-0">{{ workspace.name }} - Tags</h2>
-    <a href="{% url 'flowdesk:tag-create' workspace.id %}" class="btn btn-success">+ Create Tag</a>
+    <a href="{% url 'flowdesk:tag-create' workspace.pk %}" class="btn btn-success">+ Create Tag</a>
   </div>
 
   <table class="table table-striped table-hover align-middle">
@@ -20,10 +20,10 @@
         <tr>
           <td>{{ tag.name }}</td>
           <td class="text-center">
-            <a href="{% url 'flowdesk:tag-update' tag.id %}" class="btn btn-sm btn-primary">Update</a>
+            <a href="{% url 'flowdesk:tag-update' workspace.pk tag.pk %}" class="btn btn-sm btn-primary">Update</a>
           </td>
           <td class="text-center">
-            <form method="post" action="{% url 'flowdesk:tag-delete' tag.id %}" style="display:inline;">
+            <form method="post" action="{% url 'flowdesk:tag-delete' workspace.pk tag.pk %}" style="display:inline;">
               {% csrf_token %}
               <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this tag?');">
                 Delete
