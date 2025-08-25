@@ -9,9 +9,6 @@
         <span>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Workspace</span>
         {% if form.instance.pk %}
         <span class="d-flex gap-1">
-          <a href="{% url 'flowdesk:workspace-edit' form.instance.pk %}" class="btn btn-sm btn-warning">
-            <i class="bi bi-pencil-fill"></i>
-          </a>
           <form method="post"
                 action="{% url 'flowdesk:workspace-delete' form.instance.pk %}"
                 style="display:inline;">
