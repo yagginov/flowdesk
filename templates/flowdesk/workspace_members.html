@@ -27,7 +27,7 @@
     <table class="table table-striped table-hover align-middle">
       <thead class="table-dark">
         <tr>
-          <th>Username</th>
+          <th>User</th>
           <th>Position</th>
           <th>Role</th>
         </tr>
@@ -35,7 +35,20 @@
       <tbody>
         {% for form in formset %}
         <tr>
-          <td>{{ form.instance.user.username }}</td>
+          <td>
+            <span class="me-2 align-middle">
+              {% if form.instance.user.profile.avatar %}
+                <img src="{{ form.instance.user.profile.avatar.crop.32x32 }}" alt="{{ form.instance.user.username }} avatar"
+                     class="rounded-circle" width="32" height="32">
+              {% else %}
+                <span class="rounded-circle bg-secondary d-inline-flex justify-content-center align-items-center"
+                      style="width:32px; height:32px;">
+                  <i class="bi bi-person-fill text-white fs-6"></i>
+                </span>
+              {% endif %}
+            </span>
+            {{ form.instance.user.username }}
+          </td>
           <td>{{ form.instance.user.profile.position }}</td>
           <td>
             {{ form.id }}

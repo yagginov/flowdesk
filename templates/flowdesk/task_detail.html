@@ -47,10 +47,23 @@
         {% if task.comments.all %}
         <ul class="list-unstyled">
           {% for comment in task.comments.all %}
-          <li class="mb-2">
-            <strong>{{ comment.created_by }}:</strong>
-            {{ comment.text|linebreaks }}
-            <div class="text-muted small">{{ comment.created_at|date:"d M Y H:i" }}</div>
+          <li class="mb-2 d-flex align-items-start">
+            <div class="me-2">
+              {% if comment.created_by.profile.avatar %}
+                <img src="{{ comment.created_by.profile.avatar.crop.32x32 }}" alt="{{ comment.created_by.username }} avatar"
+                     class="rounded-circle" width="32" height="32">
+              {% else %}
+                <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center"
+                     style="width:32px; height:32px;">
+                  <i class="bi bi-person-fill text-white fs-6"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <strong>{{ comment.created_by }}:</strong>
+              {{ comment.text|linebreaks }}
+              <div class="text-muted small">{{ comment.created_at|date:"d M Y H:i" }}</div>
+            </div>
           </li>
           {% endfor %}
         </ul>
