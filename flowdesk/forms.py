@@ -47,11 +47,6 @@ class TaskForm(forms.ModelForm):
     deadline = forms.DateTimeField(
         required=False, widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
-    assigned_to = forms.ModelMultipleChoiceField(
-        queryset=User.objects.none(),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
-    )
 
     class Meta:
         model = Task

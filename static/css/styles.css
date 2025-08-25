@@ -110,3 +110,16 @@ main {
   border-radius: 15px;
   cursor: grab;
 }
+
+.mb-3 input,
+.mb-3 select,
+.mb-3 textarea,
+.mb-3 .form-check select,
+.mb-3 .form-check input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.mb-3 .select2-container {
+  width: 100% !important;
+}

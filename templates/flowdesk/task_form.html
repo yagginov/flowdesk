@@ -77,3 +77,11 @@
   </form>
 </div>
 {% endblock %}
+
+{% block script %}
+  <script>
+    $("#id_assigned_to").select2();
+    $("#id_blocking_tasks").select2();
+    $("#id_tags").select2();
+  </script>
+{% endblock %}
