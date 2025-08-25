@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from flowdesk.models import Workspace, Board, List, Task, Tag
+from flowdesk.models import Workspace, Board, List, Task, Tag, Comment
 
 User = get_user_model()
 
@@ -75,3 +75,14 @@ class TagForm(forms.ModelForm):
     class Meta:
         model = Tag
         fields = ("name",)
+
+
+class CommentForm(forms.ModelForm):
+    text = forms.CharField(
+        label="Write your comment:",
+        widget=forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
+    )
+
+    class Meta:
+        model = Comment
+        fields = ("text", )

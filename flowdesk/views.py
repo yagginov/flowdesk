@@ -10,12 +10,13 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 
 from flowdesk.models import (
-    Board,
     Workspace,
     WorkspaceMember,
+    Tag,
+    Board,
     List,
     Task,
-    Tag,
+    Comment,
 )
 from flowdesk.forms import (
     WorkspaceForm,
@@ -23,6 +24,7 @@ from flowdesk.forms import (
     ListForm,
     TaskForm,
     TagForm,
+    CommentForm,
 )
 from flowdesk.mixins import WorkspaceAccessMixin
 
@@ -81,6 +83,40 @@ class WorkspaceUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.Upda
 class WorkspaceDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
     model = Workspace
     success_url = reverse_lazy("flowdesk:index")
+
+
+class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
+    model = Tag
+    form_class = TagForm
+
+    def get_success_url(self):
+        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
+
+    def form_valid(self, form: TagForm) -> HttpResponse:
+        form.instance.workspace = self.workspace
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            messages.warning(
+                self.request,
+                f"Tag '{form.instance.name}' already exists in this workspace.",
+            )
+            return HttpResponseRedirect(self.get_success_url())
+
+
+class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+    model = Tag
+    form_class = TagForm
+
+    def get_success_url(self):
+        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
+
+
+class TagDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+    model = Tag
+
+    def get_success_url(self):
+        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
 
 
 class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
@@ -195,6 +231,11 @@ class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailVie
             "comments__created_by",
         )
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["comment_form"] = CommentForm()
+        return context
+
 
 class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
     model = Task
@@ -278,35 +319,22 @@ class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
         return HttpResponse(status=204)
 
 
-class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
-    model = Tag
-    form_class = TagForm
+class CommentCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
+    model = Comment
+    form_class = CommentForm
 
     def get_success_url(self):
-        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
+        return reverse(
+            "flowdesk:task-detail",
+            args=(
+                self.workspace.pk,
+                self.board.pk,
+                self.list.pk,
+                self.task.pk,
+            ),
+        )
 
-    def form_valid(self, form: TagForm) -> HttpResponse:
-        form.instance.workspace = self.workspace
-        try:
-            return super().form_valid(form)
-        except IntegrityError:
-            messages.warning(
-                self.request,
-                f"Tag '{form.instance.name}' already exists in this workspace.",
-            )
-            return HttpResponseRedirect(self.get_success_url())
-
-
-class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
-    model = Tag
-    form_class = TagForm
-
-    def get_success_url(self):
-        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
-
-
-class TagDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
-    model = Tag
-
-    def get_success_url(self):
-        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
+    def form_valid(self, form: CommentForm):
+        form.instance.created_by = self.request.user
+        form.instance.task = self.task
+        return super().form_valid(form)

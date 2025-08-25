@@ -24,6 +24,7 @@ from flowdesk.views import (
     TaskUpdateView,
     TaskDeleteView,
     TaskOrderUpdate,
+    CommentCreateView,
 )
 
 app_name = "flowdesk"
@@ -133,5 +134,10 @@ urlpatterns = [
         "workspaces/<int:workspace_pk>/boards/<int:board_pk>/tasks/order/",
         TaskOrderUpdate.as_view(),
         name="update-task-order",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:task_pk>/comments/create/",
+        CommentCreateView.as_view(),
+        name="comment-create",
     ),
 ]

@@ -25,6 +25,12 @@ class WorkspaceAccessMixin:
             if lst.board.workspace_id != workspace.pk:
                 raise PermissionDenied("This list does not belong to the workspace")
 
+        if "task_pk" in kwargs:
+            task = get_object_or_404(Task, pk=kwargs["task_pk"])
+            self.task = task
+            if task.list.board.workspace_id != workspace.pk:
+                raise PermissionDenied("This list does not belong to the workspace")
+
         if "pk" in kwargs and self.model in [Board, List, Task, Tag]:
             obj = get_object_or_404(self.model, pk=kwargs["pk"])
             related_ws = (
