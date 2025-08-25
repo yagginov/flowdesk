@@ -57,15 +57,18 @@ class TaskForm(forms.ModelForm):
             "blocking_tasks",
         )
 
-    def __init__(self, *args, workspace=None, board=None, **kwargs):
+    def __init__(self, *args, workspace=None, board=None, task=None, **kwargs):
         super().__init__(*args, **kwargs)
         if workspace:
             self.fields["assigned_to"].queryset = workspace.members.all()
             self.fields["tags"].queryset = workspace.tags.all()
         if board:
-            self.fields["blocking_tasks"].queryset = Task.objects.filter(
+            queryset = Task.objects.filter(
                 list__board=board
             )
+            if task:
+                queryset = queryset.exclude(pk=task.pk)
+            self.fields["blocking_tasks"].queryset = queryset
 
 
 class TagForm(forms.ModelForm):

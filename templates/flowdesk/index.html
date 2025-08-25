@@ -1,5 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h1>Hello World</h1>
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8">
+      <h1 class="mb-4">Welcome, {{ request.user.get_full_name|default:request.user.username }}!</h1>
+
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Your Workspaces</h5>
+        </div>
+        <div class="card-body">
+          {% if user_workspaces %}
+            <ul class="list-group list-group-flush">
+              {% for ws in user_workspaces %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <a href="{% url 'flowdesk:workspace-detail' ws.pk %}">
+                    {{ ws.name }}
+                  </a>
+                  <span class="text-muted">{{ ws.description|truncatechars:50 }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">You don’t belong to any workspace yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

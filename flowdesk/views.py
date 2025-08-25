@@ -218,10 +218,12 @@ class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateVie
 
     def get_success_url(self):
         return reverse(
-            "flowdesk:board-detail",
+            "flowdesk:task-detail",
             args=(
                 self.workspace.pk,
                 self.board.pk,
+                self.list.pk,
+                self.object.pk,
             ),
         )
 
@@ -229,6 +231,7 @@ class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateVie
         kwargs = super().get_form_kwargs()
         kwargs["board"] = self.board
         kwargs["workspace"] = self.workspace
+        kwargs["task"] = self.object
         return kwargs
 
 
