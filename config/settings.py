@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALLOWED_HOSTS = ["*"]
 
 debug_str = os.getenv("DEBUG")
-DEBUG = debug_str== "True" if debug_str else False
+DEBUG = debug_str == "True" if debug_str else False
 
 INTERNAL_IPS = [
     "127.0.0.1",

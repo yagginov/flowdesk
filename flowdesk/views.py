@@ -13,12 +13,14 @@ from flowdesk.models import (
     WorkspaceMember,
     List,
     Task,
+    Tag,
 )
 from flowdesk.forms import (
     WorkspaceForm,
     BoardForm,
     ListForm,
     TaskForm,
+    TagForm,
 )
 
 
@@ -32,12 +34,9 @@ class WorkspaceDetailView(LoginRequiredMixin, generic.DetailView):
     template_name = "flowdesk/workspace_detail.html"
 
     def get_queryset(self) -> QuerySet:
-        queryset = Workspace.objects.filter(
-            members=self.request.user.pk
-        ).prefetch_related(
+        return Workspace.objects.filter(members=self.request.user.pk).prefetch_related(
             "boards"
         )
-        return queryset
 
 
 class WorkspaceMembersView(LoginRequiredMixin, generic.DetailView):
@@ -45,10 +44,18 @@ class WorkspaceMembersView(LoginRequiredMixin, generic.DetailView):
     template_name = "flowdesk/workspace_members.html"
 
     def get_queryset(self) -> QuerySet:
-        return Workspace.objects.filter(
-            members=self.request.user.pk
-        ).prefetch_related(
+        return Workspace.objects.filter(members=self.request.user.pk).prefetch_related(
             "memberships__user__profile"
+        )
+
+
+class WorkspaceTagsView(LoginRequiredMixin, generic.DetailView):
+    model = Workspace
+    template_name = "flowdesk/workspace_tags.html"
+
+    def get_queryset(self) -> QuerySet:
+        return Workspace.objects.filter(members=self.request.user.pk).prefetch_related(
+            "tags"
         )
 
 
@@ -59,9 +66,7 @@ class BoardDetailView(LoginRequiredMixin, generic.DetailView):
     def get_queryset(self) -> QuerySet:
         return Board.objects.filter(
             workspace__members=self.request.user.pk
-        ).prefetch_related(
-            "lists"
-        )
+        ).prefetch_related("lists__tasks")
 
 
 class WorkspaceCreateView(LoginRequiredMixin, generic.CreateView):
@@ -86,7 +91,7 @@ class BoardCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = BoardForm
 
     def get_success_url(self):
-        return reverse("flowdesk:workspace-detail", args=(self.kwargs["workspace_pk"], ))
+        return reverse("flowdesk:workspace-detail", args=(self.kwargs["workspace_pk"],))
 
     def form_valid(self, form: BoardForm) -> HttpResponse:
         workspace = get_object_or_404(Workspace, pk=self.kwargs["workspace_pk"])
@@ -99,7 +104,7 @@ class ListCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = ListForm
 
     def get_success_url(self):
-        return reverse("flowdesk:board-detail", args=(self.kwargs["board_pk"], ))
+        return reverse("flowdesk:board-detail", args=(self.kwargs["board_pk"],))
 
     def form_valid(self, form: ListForm) -> HttpResponse:
         board = get_object_or_404(Board, pk=self.kwargs["board_pk"])
@@ -116,7 +121,7 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
 
     def get_success_url(self):
         list = get_object_or_404(List, pk=self.kwargs["list_pk"])
-        return reverse("flowdesk:board-detail", args=(list.board_id, ))
+        return reverse("flowdesk:board-detail", args=(list.board_id,))
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -171,3 +176,46 @@ class TaskOrderUpdate(LoginRequiredMixin, generic.View):
         Task.objects.bulk_update(objs=tasks, fields=["position", "list_id"])
 
         return HttpResponse(status=204)
+
+
+class TaskDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Task
+    queryset = Task.objects.prefetch_related("blocking_tasks")
+
+
+class TagCreateView(LoginRequiredMixin, generic.CreateView):
+    model = Tag
+    form_class = TagForm
+
+    def get_success_url(self) -> str:
+        return reverse("flowdesk:workspace-tags", args=(self.kwargs["workspace_pk"],))
+
+    def form_valid(self, form: BoardForm) -> HttpResponse:
+        workspace = get_object_or_404(Workspace, pk=self.kwargs["workspace_pk"])
+        form.instance.workspace = workspace
+        return super().form_valid(form)
+
+
+class TagUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Tag
+    form_class = TagForm
+
+    def get_queryset(self) -> QuerySet:
+        return Tag.objects.filter(
+            workspace__members=self.request.user
+        )
+
+    def get_success_url(self) -> str:
+        return reverse("flowdesk:workspace-tags", args=(self.get_object().workspace.pk, ))
+
+
+class TagDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Tag
+
+    def get_queryset(self) -> QuerySet:
+        return Tag.objects.filter(
+            workspace__members=self.request.user
+        )
+
+    def get_success_url(self) -> str:
+        return reverse("flowdesk:workspace-tags", args=(self.get_object().workspace.pk, ))

@@ -67,7 +67,7 @@ class EmailConfirmationService:
 
             messages.success(
                 request,
-                "Thank you for confirming your email. You can now login to your account."
+                "Thank you for confirming your email. You can now login to your account.",
             )
             return True
         return False

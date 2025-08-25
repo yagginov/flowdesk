@@ -9,34 +9,39 @@ User = get_user_model()
 class WorkspaceForm(forms.ModelForm):
     class Meta:
         model = Workspace
-        fields = ("name", "description", )
+        fields = (
+            "name",
+            "description",
+        )
 
 
 class BoardForm(forms.ModelForm):
     class Meta:
         model = Board
-        fields = ("name", "description", )
+        fields = (
+            "name",
+            "description",
+        )
 
 
 class ListForm(forms.ModelForm):
     class Meta:
         model = List
-        fields = ("name", )
+        fields = ("name",)
 
 
 class TaskForm(forms.ModelForm):
     description = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={"rows": 4, "class": "form-control"})
+        widget=forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
     )
     deadline = forms.DateTimeField(
-        required=False,
-        widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+        required=False, widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
     assigned_to = forms.ModelMultipleChoiceField(
         queryset=User.objects.none(),
         required=False,
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
     )
 
     class Meta:
@@ -57,4 +62,12 @@ class TaskForm(forms.ModelForm):
         if workspace:
             self.fields["assigned_to"].queryset = workspace.members.all()
         if board:
-            self.fields["blocking_tasks"].queryset = Task.objects.filter(list__board=board)
+            self.fields["blocking_tasks"].queryset = Task.objects.filter(
+                list__board=board
+            )
+
+
+class TagForm(forms.ModelForm):
+    class Meta:
+        model = Tag
+        fields = ("name", )

@@ -9,8 +9,12 @@ class User(AbstractUser):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
-    avatar = models.ImageField(null=True, blank=True, upload_to="accounts/profiles/avatars/")
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
+    )
+    avatar = models.ImageField(
+        null=True, blank=True, upload_to="accounts/profiles/avatars/"
+    )
     position = models.CharField(max_length=63)
 
     def __str__(self) -> str:

@@ -11,6 +11,7 @@ class LogerBaseModel(models.Model):
     class Meta:
         abstract = True
 
+
 class WorkspaceMember(models.Model):
     class Roles(models.TextChoices):
         OWNER = "OWNER", "Owner"
@@ -19,14 +20,10 @@ class WorkspaceMember(models.Model):
         GUEST = "GUEST", "Guest"
 
     user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="workspace_memberships"
+        User, on_delete=models.CASCADE, related_name="workspace_memberships"
     )
     workspace = models.ForeignKey(
-        "Workspace",
-        on_delete=models.CASCADE,
-        related_name="memberships"
+        "Workspace", on_delete=models.CASCADE, related_name="memberships"
     )
     role = models.CharField(max_length=15, choices=Roles.choices, default=Roles.GUEST)
 
@@ -59,7 +56,7 @@ class List(LogerBaseModel):
     position = models.IntegerField()
 
     class Meta:
-        ordering = ("position", )
+        ordering = ("position",)
 
     def __str__(self) -> str:
         return self.name
@@ -68,16 +65,13 @@ class List(LogerBaseModel):
 class Tag(LogerBaseModel):
     name = models.CharField(max_length=63)
     workspace = models.ForeignKey(
-        Workspace,
-        on_delete=models.CASCADE,
-        related_name="tags"
+        Workspace, on_delete=models.CASCADE, related_name="tags"
     )
 
     class Meta:
         constraints = (
             models.UniqueConstraint(
-                fields=("name", "workspace"),
-                name="name_workspace_unique_constraint"
+                fields=("name", "workspace"), name="name_workspace_unique_constraint"
             ),
         )
 
@@ -103,8 +97,12 @@ class Task(LogerBaseModel):
 
     title = models.CharField(max_length=63)
     description = models.TextField(blank=True)
-    priority = models.CharField(max_length=15, choices=Priority.choices, default=Priority.LOW)
-    status = models.CharField(max_length=15, choices=Status.choices, default=Status.TODO)
+    priority = models.CharField(
+        max_length=15, choices=Priority.choices, default=Priority.LOW
+    )
+    status = models.CharField(
+        max_length=15, choices=Status.choices, default=Status.TODO
+    )
     deadline = models.DateTimeField(null=True)
     list = models.ForeignKey(List, on_delete=models.CASCADE, related_name="tasks")
     tags = models.ManyToManyField(Tag, related_name="tasks", blank=True)
@@ -116,9 +114,7 @@ class Task(LogerBaseModel):
     blocking_tasks = models.ManyToManyField("Task", related_name="tasks")
 
     class Meta:
-        ordering = (
-            "position",
-        )
+        ordering = ("position",)
 
     def __str__(self) -> str:
         return self.title
