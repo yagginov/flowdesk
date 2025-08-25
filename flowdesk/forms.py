@@ -33,12 +33,7 @@ class TaskForm(forms.ModelForm):
         required=False,
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
     )
-    tags = forms.ModelMultipleChoiceField(
-        queryset=Tag.objects.all(),
-        required=False,
-        widget=forms.CheckboxSelectMultiple
-    )
-    members = forms.ModelMultipleChoiceField(
+    assigned_to = forms.ModelMultipleChoiceField(
         queryset=User.objects.none(),
         required=False,
         widget=forms.CheckboxSelectMultiple
@@ -53,12 +48,13 @@ class TaskForm(forms.ModelForm):
             "status",
             "deadline",
             "tags",
-            "members",
+            "assigned_to",
+            "blocking_tasks",
         )
 
-    def __init__(self, *args, workspace=None, **kwargs):
+    def __init__(self, *args, workspace=None, board=None, **kwargs):
         super().__init__(*args, **kwargs)
         if workspace:
-            self.fields["members"].queryset = workspace.members.all()
-
-        
+            self.fields["assigned_to"].queryset = workspace.members.all()
+        if board:
+            self.fields["blocking_tasks"].queryset = Task.objects.filter(list__board=board)

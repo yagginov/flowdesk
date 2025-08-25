@@ -4,6 +4,13 @@ from django.conf import settings
 User = settings.AUTH_USER_MODEL
 
 
+class LogerBaseModel(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
 class WorkspaceMember(models.Model):
     class Roles(models.TextChoices):
         OWNER = "OWNER", "Owner"
@@ -24,31 +31,29 @@ class WorkspaceMember(models.Model):
     role = models.CharField(max_length=15, choices=Roles.choices, default=Roles.GUEST)
 
 
-class Workspace(models.Model):
+class Workspace(LogerBaseModel):
     name = models.CharField(max_length=63)
-    description = models.CharField(max_length=511)
+    description = models.CharField(max_length=511, blank=True)
     members = models.ManyToManyField(
         User, blank=True, through=WorkspaceMember, related_name="workspaces"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.name
 
 
-class Board(models.Model):
+class Board(LogerBaseModel):
     name = models.CharField(max_length=63)
-    description = models.CharField(max_length=511)
+    description = models.CharField(max_length=511, blank=True)
     workspace = models.ForeignKey(
         Workspace, on_delete=models.CASCADE, related_name="boards"
     )
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.name
 
 
-class List(models.Model):
+class List(LogerBaseModel):
     name = models.CharField(max_length=63)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="lists")
     position = models.IntegerField()
@@ -60,14 +65,27 @@ class List(models.Model):
         return self.name
 
 
-class Tag(models.Model):
+class Tag(LogerBaseModel):
     name = models.CharField(max_length=63)
+    workspace = models.ForeignKey(
+        Workspace,
+        on_delete=models.CASCADE,
+        related_name="tags"
+    )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=("name", "workspace"),
+                name="name_workspace_unique_constraint"
+            ),
+        )
 
     def __str__(self) -> str:
         return self.name
 
 
-class Task(models.Model):
+class Task(LogerBaseModel):
     class Priority(models.TextChoices):
         LOW = "LOW", "Low"
         MEDIUM = "MEDIUM", "Medium"
@@ -84,18 +102,18 @@ class Task(models.Model):
         ARCHIVED = "ARCHIVED", "Archived"
 
     title = models.CharField(max_length=63)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     priority = models.CharField(max_length=15, choices=Priority.choices, default=Priority.LOW)
     status = models.CharField(max_length=15, choices=Status.choices, default=Status.TODO)
-    created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField(null=True)
     list = models.ForeignKey(List, on_delete=models.CASCADE, related_name="tasks")
-    tags = models.ManyToManyField(Tag, related_name="tasks")
+    tags = models.ManyToManyField(Tag, related_name="tasks", blank=True)
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="created_tasks"
     )
-    members = models.ManyToManyField(User, related_name="tasks")
+    assigned_to = models.ManyToManyField(User, related_name="tasks", blank=True)
     position = models.IntegerField()
+    blocking_tasks = models.ManyToManyField("Task", related_name="tasks")
 
     class Meta:
         ordering = (
@@ -106,9 +124,8 @@ class Task(models.Model):
         return self.title
 
 
-class Comment(models.Model):
+class Comment(LogerBaseModel):
     text = models.CharField(max_length=511)
-    created_at = models.DateTimeField(auto_now_add=True)
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="comments")
     created_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="comments"

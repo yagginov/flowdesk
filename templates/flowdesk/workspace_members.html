@@ -16,7 +16,7 @@
       {% for member in workspace.memberships.all %}
         <tr>
           <td>{{ member.user.username }}</td>
-          <td>{{ member.user.position.name }}</td>
+          <td>{{ member.user.profile.position }}</td>
           <td>{{ member.get_role_display }}</td>
         </tr>
       {% empty %}

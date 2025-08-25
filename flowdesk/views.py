@@ -48,7 +48,7 @@ class WorkspaceMembersView(LoginRequiredMixin, generic.DetailView):
         return Workspace.objects.filter(
             members=self.request.user.pk
         ).prefetch_related(
-            "memberships__user__position"
+            "memberships__user__profile"
         )
 
 
@@ -121,6 +121,7 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         list_obj = get_object_or_404(List, pk=self.kwargs["list_pk"])
+        kwargs["board"] = list_obj.board
         kwargs["workspace"] = list_obj.board.workspace
         return kwargs
 
