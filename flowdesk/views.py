@@ -87,6 +87,21 @@ class BoardCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVi
         return super().form_valid(form)
 
 
+class BoardUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+    model = Board
+    form_class = BoardForm
+
+    def get_success_url(self):
+        return reverse("flowdesk:workspace-detail", args=(self.workspace.pk,))
+
+
+class BoardDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+    model = Board
+
+    def get_success_url(self):
+        return reverse("flowdesk:workspace-detail", args=(self.workspace.pk,))
+
+
 class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
     model = List
     form_class = ListForm
@@ -104,6 +119,52 @@ class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVie
         last_position = self.board.lists.aggregate(Max("position"))["position__max"]
         form.instance.position = (last_position or 0) + 1
         return super().form_valid(form)
+
+
+class ListUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+    model = List
+    form_class = ListForm
+
+    def get_success_url(self):
+        return reverse(
+            "flowdesk:board-detail", args=(
+                self.workspace.pk,
+                self.board.pk,
+            )
+        )
+
+
+class ListDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+    model = List
+
+    def get_success_url(self):
+        return reverse(
+            "flowdesk:board-detail", args=(
+                self.workspace.pk,
+                self.board.pk,
+            )
+        )
+
+
+class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
+    def post(self, request, board_pk, *args, **kwargs):
+        data = json.loads(request.body)
+        order = data.get("order", [])
+
+        list_ids = [int(item["id"]) for item in order]
+        lists = List.objects.filter(pk__in=list_ids, board_id=board_pk)
+        positions = {int(item["id"]): item["position"] for item in order}
+
+        for lst in lists:
+            lst.position = positions.get(lst.id, lst.position)
+
+        List.objects.bulk_update(objs=lists, fields=["position"])
+        return HttpResponse(status=204)
+
+
+class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
+    model = Task
+    queryset = Task.objects.prefetch_related("blocking_tasks")
 
 
 class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
@@ -132,20 +193,35 @@ class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVie
         return super().form_valid(form)
 
 
-class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
-    def post(self, request, board_pk, *args, **kwargs):
-        data = json.loads(request.body)
-        order = data.get("order", [])
+class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+    model = Task
+    form_class = TaskForm
 
-        list_ids = [int(item["id"]) for item in order]
-        lists = List.objects.filter(pk__in=list_ids, board_id=board_pk)
-        positions = {int(item["id"]): item["position"] for item in order}
+    def get_success_url(self):
+        return reverse(
+            "flowdesk:board-detail", args=(
+                self.workspace.pk,
+                self.board.pk,
+            )
+        )
 
-        for lst in lists:
-            lst.position = positions.get(lst.id, lst.position)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["board"] = self.board
+        kwargs["workspace"] = self.workspace
+        return kwargs
 
-        List.objects.bulk_update(objs=lists, fields=["position"])
-        return HttpResponse(status=204)
+
+class TaskDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+    model = Task
+
+    def get_success_url(self):
+        return reverse(
+            "flowdesk:board-detail", args=(
+                self.workspace.pk,
+                self.board.pk,
+            )
+        )
 
 
 class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
@@ -165,11 +241,6 @@ class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
 
         Task.objects.bulk_update(objs=tasks, fields=["position", "list_id"])
         return HttpResponse(status=204)
-
-
-class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
-    model = Task
-    queryset = Task.objects.prefetch_related("blocking_tasks")
 
 
 class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):

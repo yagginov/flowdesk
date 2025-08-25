@@ -61,9 +61,15 @@ main {
 }
 
 .card.card-list {
-  min-width: 200px;
-  max-width: 200px;
+  min-width: 250px;
+  max-width: 250px;
   flex: 0 0 auto;
+}
+
+.card-header .btn, 
+.card-header form {
+  position: relative;
+  z-index: 5;
 }
 
 .lists-wrapper {
