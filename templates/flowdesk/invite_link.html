@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">{{ workspace.name }} - Invite Link</h2>
+
+  <div class="card p-3 mb-3">
+    <p class="mb-2">Use the link below to invite someone to this workspace:</p>
+
+    <div class="input-group">
+      <input type="text" class="form-control" id="inviteLink" value="{{ invite_link }}" readonly>
+      <button class="btn btn-outline-secondary" type="button" id="copyButton">Copy</button>
+    </div>
+  </div>
+
+  <a href="{% url 'flowdesk:workspace-members' workspace.id %}" class="btn btn-secondary">
+    Back to Members
+  </a>
+</div>
+
+<script>
+document.getElementById("copyButton").addEventListener("click", function() {
+    const copyText = document.getElementById("inviteLink");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+});
+</script>
+{% endblock %}

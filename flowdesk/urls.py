@@ -8,6 +8,8 @@ from flowdesk.views import (
     WorkspaceCreateView,
     WorkspaceUpdateView,
     WorkspaceDeleteView,
+    WorkspaceInviteView,
+    WorkspaceJoinView,
     TagCreateView,
     TagUpdateView,
     TagDeleteView,
@@ -55,6 +57,8 @@ urlpatterns = [
         WorkspaceDeleteView.as_view(),
         name="workspace-delete",
     ),
+    path("workspaces/<int:workspace_id>/invite/", WorkspaceInviteView.as_view(), name="workspace-invite"),
+    path("workspaces/<int:workspace_id>/join/<uidb64>/<token>/", WorkspaceJoinView.as_view(), name="workspace-join"),
     path(
         "workspaces/<int:workspace_pk>/tags/create/",
         TagCreateView.as_view(),

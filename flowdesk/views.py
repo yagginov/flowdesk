@@ -8,6 +8,9 @@ from django.db.models import Max, QuerySet
 from django.db import IntegrityError
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth import get_user_model
 
 from flowdesk.models import (
     Workspace,
@@ -27,6 +30,9 @@ from flowdesk.forms import (
     CommentForm,
 )
 from flowdesk.mixins import WorkspaceAccessMixin
+from flowdesk.services.workspace_invite import generate_invite_link, workspace_invite_token
+
+User = get_user_model()
 
 
 class IndexView(LoginRequiredMixin, generic.TemplateView):
@@ -49,6 +55,59 @@ class WorkspaceMembersView(
 
     def get_queryset(self) -> QuerySet:
         return Workspace.objects.prefetch_related("memberships__user__profile")
+
+
+class WorkspaceInviteView(LoginRequiredMixin, generic.DetailView):
+    model = Workspace
+    template_name = "flowdesk/invite_link.html"
+    pk_url_kwarg = "workspace_id"
+    context_object_name = "workspace"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        workspace = self.get_object()
+
+        if not workspace.memberships.filter(
+            user=self.request.user,
+            role__in=[WorkspaceMember.Roles.OWNER, WorkspaceMember.Roles.ADMIN]
+        ).exists():
+            messages.error(self.request, "You do not have permission to generate invites.")
+            context["invite_link"] = None
+        else:
+            context["invite_link"] = generate_invite_link(self.request, workspace, self.request.user)
+        return context
+
+
+class WorkspaceJoinView(LoginRequiredMixin, generic.RedirectView):
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        workspace_id = kwargs.get("workspace_id")
+        uidb64 = kwargs.get("uidb64")
+        token = kwargs.get("token")
+
+        workspace = get_object_or_404(Workspace, pk=workspace_id)
+
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            inviter = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            inviter = None
+
+        if inviter and workspace_invite_token.check_token(inviter, token):
+            membership, created = WorkspaceMember.objects.get_or_create(
+                user=self.request.user,
+                workspace=workspace,
+                defaults={"role": WorkspaceMember.Roles.GUEST},
+            )
+            if created:
+                messages.success(self.request, f"You have joined {workspace.name} as Guest.")
+            else:
+                messages.info(self.request, f"You are already a member of {workspace.name}.")
+            return reverse("flowdesk:workspace-members", kwargs={"pk": workspace.id})
+
+        messages.error(self.request, "Invalid or expired invitation link.")
+        return reverse("flowdesk:index")
 
 
 class WorkspaceTagsView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
