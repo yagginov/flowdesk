@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.views import generic
 from django.shortcuts import render, redirect
 from django.http import HttpRequest, HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from accounts.forms import SignUpForm
 from accounts.services.email_confirmation_service import EmailConfirmationService
@@ -30,3 +31,7 @@ class ActivateAccountView(generic.View):
 
 class PreLogoutView(generic.TemplateView):
     template_name = "registration/pre_logged_out.html"
+
+
+class UserDetailView(LoginRequiredMixin, generic.DetailView):
+    model = User

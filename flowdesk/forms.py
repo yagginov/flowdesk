@@ -63,9 +63,7 @@ class TaskForm(forms.ModelForm):
             self.fields["assigned_to"].queryset = workspace.members.all()
             self.fields["tags"].queryset = workspace.tags.all()
         if board:
-            queryset = Task.objects.filter(
-                list__board=board
-            )
+            queryset = Task.objects.filter(list__board=board)
             if task:
                 queryset = queryset.exclude(pk=task.pk)
             self.fields["blocking_tasks"].queryset = queryset
@@ -85,4 +83,4 @@ class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
-        fields = ("text", )
+        fields = ("text",)

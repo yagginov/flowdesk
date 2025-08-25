@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body d-flex align-items-center">
+      
+      <div class="me-3">
+        {% if user.profile.avatar %}
+          <img src="{{ user.profile.avatar.crop.128x128 }}" alt="{{ user.username }} avatar"
+               class="rounded-circle" width="128" height="128">
+        {% else %}
+          <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center"
+               style="width:128px; height:128px;">
+            <i class="bi bi-person-fill text-white fs-3"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <h4 class="mb-1">{{ user.username }}</h4>
+        <p class="mb-1 text-muted">{{ user.first_name }} {{ user.last_name }}</p>
+        {% if user.profile.position %}
+          <p class="mb-0">{{ user.profile.position }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-header">
+      <h5 class="mb-0">Additional Information</h5>
+    </div>
+    <div class="card-body">
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Date joined:</strong> {{ user.date_joined|date:"d M Y H:i" }}</p>
+      <p><strong>Last login:</strong>
+        {% if user.last_login %}
+          {{ user.last_login|date:"d M Y H:i" }}
+        {% else %}
+          <span class="text-muted">Never</span>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

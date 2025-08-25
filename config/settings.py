@@ -29,12 +29,22 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "crispy_forms",
     "crispy_bootstrap5",
+    "versatileimagefield",
     "accounts",
     "flowdesk",
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+
+VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
+    "avatar": [
+        ("thumbnail", "crop__32x32"),
+        ("medium", "crop__128x128"),
+        ("large", "crop__300x300"),
+    ],
+}
 
 
 MIDDLEWARE = [

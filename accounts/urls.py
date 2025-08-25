@@ -1,6 +1,11 @@
 from django.urls import path, include
 
-from accounts.views import SignUpView, ActivateAccountView, PreLogoutView
+from accounts.views import (
+    SignUpView,
+    ActivateAccountView,
+    PreLogoutView,
+    UserDetailView,
+)
 
 app_name = "accounts"
 
@@ -13,4 +18,5 @@ urlpatterns = [
         ActivateAccountView.as_view(),
         name="activate",
     ),
+    path("users/<int:pk>/", UserDetailView.as_view(), name="user-detail"),
 ]

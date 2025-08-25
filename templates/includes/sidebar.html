@@ -16,7 +16,7 @@
       <div class="collapse" id="account-collapse">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
           {% if request.user.is_authenticated %}
-            <li><a href="#" class="">Profile</a></li>
+            <li><a href="{% url 'accounts:user-detail' request.user.pk %}" class="">Profile</a></li>
             <li><a href="#" class="">Settings</a></li>
             <li><a href="{% url 'accounts:pre-logout' %}" class="">Logout</a></li>
           {% else %}

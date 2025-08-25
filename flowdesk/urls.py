@@ -48,12 +48,12 @@ urlpatterns = [
     path(
         "workspaces/<int:pk>/update/",
         WorkspaceUpdateView.as_view(),
-        name="workspace-update"
+        name="workspace-update",
     ),
     path(
         "workspaces/<int:pk>/delete/",
         WorkspaceDeleteView.as_view(),
-        name="workspace-delete"
+        name="workspace-delete",
     ),
     path(
         "workspaces/<int:workspace_pk>/tags/create/",
