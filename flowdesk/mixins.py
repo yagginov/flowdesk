@@ -3,6 +3,52 @@ from django.core.exceptions import PermissionDenied
 from flowdesk.models import Workspace, Board, List, Task, Tag
 
 
+from flowdesk.models import WorkspaceMember
+
+class RoleRequiredMixin:
+    required_role = None
+    workspace_attr = "workspace"
+
+    def dispatch(self, request, *args, **kwargs):
+        workspace = getattr(self, self.workspace_attr, None)
+        if not workspace:
+            raise PermissionDenied("Workspace not found for role check.")
+        try:
+            member = WorkspaceMember.objects.get(user=request.user, workspace=workspace)
+        except WorkspaceMember.DoesNotExist:
+            raise PermissionDenied("You are not a member of this workspace.")
+        if not self.has_required_role(member.role):
+            raise PermissionDenied(f"You must have at least {self.required_role} role to perform this action.")
+        return super().dispatch(request, *args, **kwargs)
+
+    def has_required_role(self, user_role):
+        hierarchy = [
+            WorkspaceMember.Roles.GUEST,
+            WorkspaceMember.Roles.USER,
+            WorkspaceMember.Roles.ADMIN,
+            WorkspaceMember.Roles.OWNER,
+        ]
+        required_idx = hierarchy.index(self.required_role)
+        user_idx = hierarchy.index(user_role)
+        return user_idx >= required_idx
+
+
+class OwnerRequiredMixin(RoleRequiredMixin):
+    required_role = WorkspaceMember.Roles.OWNER
+
+
+class AdminRequiredMixin(RoleRequiredMixin):
+    required_role = WorkspaceMember.Roles.ADMIN
+
+
+class UserRequiredMixin(RoleRequiredMixin):
+    required_role = WorkspaceMember.Roles.USER
+
+
+class GuestRequiredMixin(RoleRequiredMixin):
+    required_role = WorkspaceMember.Roles.GUEST
+
+
 class WorkspaceAccessMixin:
     workspace_lookup_url_kwarg = "workspace_pk"
 
@@ -29,7 +75,7 @@ class WorkspaceAccessMixin:
             task = get_object_or_404(Task, pk=kwargs["task_pk"])
             self.task = task
             if task.list.board.workspace_id != workspace.pk:
-                raise PermissionDenied("This list does not belong to the workspace")
+                raise PermissionDenied("This task does not belong to the workspace")
 
         if "pk" in kwargs and self.model in [Board, List, Task, Tag]:
             obj = get_object_or_404(self.model, pk=kwargs["pk"])

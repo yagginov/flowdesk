@@ -30,11 +30,8 @@ from flowdesk.forms import (
     CommentForm,
     WorkspaceMemberFormSet
 )
-from flowdesk.mixins import WorkspaceAccessMixin
-from flowdesk.services.workspace_invite import (
-    generate_invite_link,
-    workspace_invite_token,
-)
+from flowdesk.mixins import WorkspaceAccessMixin, AdminRequiredMixin, UserRequiredMixin
+from flowdesk.services.workspace_invite import generate_invite_link, workspace_invite_token
 
 User = get_user_model()
 
@@ -161,18 +158,18 @@ class WorkspaceCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
 
 
-class WorkspaceUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+class WorkspaceUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
     model = Workspace
     form_class = WorkspaceForm
     success_url = reverse_lazy("flowdesk:index")
 
 
-class WorkspaceDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+class WorkspaceDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
     model = Workspace
     success_url = reverse_lazy("flowdesk:index")
 
 
-class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
+class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView):
     model = Tag
     form_class = TagForm
 
@@ -191,7 +188,7 @@ class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView
             return HttpResponseRedirect(self.get_success_url())
 
 
-class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
     model = Tag
     form_class = TagForm
 
@@ -199,7 +196,7 @@ class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView
         return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
 
 
-class TagDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+class TagDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
     model = Tag
 
     def get_success_url(self):
@@ -215,7 +212,7 @@ class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailVi
         )
 
 
-class BoardCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
+class BoardCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView):
     model = Board
     form_class = BoardForm
 
@@ -227,7 +224,7 @@ class BoardCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVi
         return super().form_valid(form)
 
 
-class BoardUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+class BoardUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
     model = Board
     form_class = BoardForm
 
@@ -235,14 +232,14 @@ class BoardUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateVi
         return reverse("flowdesk:workspace-detail", args=(self.workspace.pk,))
 
 
-class BoardDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+class BoardDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
     model = Board
 
     def get_success_url(self):
         return reverse("flowdesk:workspace-detail", args=(self.workspace.pk,))
 
 
-class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
+class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView):
     model = List
     form_class = ListForm
 
@@ -262,7 +259,7 @@ class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVie
         return super().form_valid(form)
 
 
-class ListUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+class ListUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
     model = List
     form_class = ListForm
 
@@ -276,7 +273,7 @@ class ListUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateVie
         )
 
 
-class ListDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+class ListDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
     model = List
 
     def get_success_url(self):
@@ -289,7 +286,7 @@ class ListDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteVie
         )
 
 
-class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
+class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.View):
     def post(self, request: HttpRequest, board_pk: int, *args, **kwargs):
         data = json.loads(request.body)
         order = data.get("order", [])
@@ -324,7 +321,7 @@ class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailVie
         return context
 
 
-class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
+class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.CreateView):
     model = Task
     form_class = TaskForm
 
@@ -351,7 +348,7 @@ class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVie
         return super().form_valid(form)
 
 
-class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
+class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.UpdateView):
     model = Task
     form_class = TaskForm
 
@@ -374,7 +371,7 @@ class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateVie
         return kwargs
 
 
-class TaskDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
+class TaskDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.DeleteView):
     model = Task
 
     def get_success_url(self):
@@ -387,7 +384,7 @@ class TaskDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteVie
         )
 
 
-class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
+class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.View):
     def post(self, request, board_pk, *args, **kwargs):
         data = json.loads(request.body)
         moves = data.get("moves", [])
@@ -406,7 +403,7 @@ class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
         return HttpResponse(status=204)
 
 
-class CommentCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
+class CommentCreateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.CreateView):
     model = Comment
     form_class = CommentForm
 
