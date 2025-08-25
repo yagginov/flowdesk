@@ -17,7 +17,7 @@
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
           {% if request.user.is_authenticated %}
             <li><a href="{% url 'accounts:user-detail' request.user.pk %}" class="">Profile</a></li>
-            <li><a href="#" class="">Settings</a></li>
+            <li><a href="{% url 'accounts:user-update' %}" class="">Settings</a></li>
             <li><a href="{% url 'accounts:pre-logout' %}" class="">Logout</a></li>
           {% else %}
             <li><a href="{% url 'accounts:login' %}" class="">Login</a></li>
