@@ -72,7 +72,11 @@ urlpatterns = [
         BoardDeleteView.as_view(),
         name="board-delete",
     ),
-    path("workspaces/<int:workspace_pk>/boards/<int:pk>/", BoardDetailView.as_view(), name="board-detail"),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:pk>/",
+        BoardDetailView.as_view(),
+        name="board-detail",
+    ),
     path(
         "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/create/",
         ListCreateView.as_view(),

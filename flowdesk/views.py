@@ -3,9 +3,11 @@ import json
 from django.http import HttpRequest, HttpResponse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.db.models import Max, QuerySet
+from django.db import IntegrityError
+from django.contrib import messages
+from django.http import HttpResponseRedirect
 
 from flowdesk.models import (
     Board,
@@ -37,7 +39,9 @@ class WorkspaceDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.Deta
         return Workspace.objects.prefetch_related("boards")
 
 
-class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
+class WorkspaceMembersView(
+    LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView
+):
     model = Workspace
     template_name = "flowdesk/workspace_members.html"
 
@@ -72,7 +76,9 @@ class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailVi
     model = Board
 
     def get_queryset(self) -> QuerySet:
-        return Board.objects.prefetch_related("lists__tasks").select_related("workspace")
+        return Board.objects.prefetch_related("lists__tasks").select_related(
+            "workspace"
+        )
 
 
 class BoardCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
@@ -108,10 +114,11 @@ class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVie
 
     def get_success_url(self):
         return reverse(
-            "flowdesk:board-detail", args=(
+            "flowdesk:board-detail",
+            args=(
                 self.workspace.pk,
                 self.board.pk,
-            )
+            ),
         )
 
     def form_valid(self, form: ListForm) -> HttpResponse:
@@ -127,10 +134,11 @@ class ListUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateVie
 
     def get_success_url(self):
         return reverse(
-            "flowdesk:board-detail", args=(
+            "flowdesk:board-detail",
+            args=(
                 self.workspace.pk,
                 self.board.pk,
-            )
+            ),
         )
 
 
@@ -139,15 +147,16 @@ class ListDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteVie
 
     def get_success_url(self):
         return reverse(
-            "flowdesk:board-detail", args=(
+            "flowdesk:board-detail",
+            args=(
                 self.workspace.pk,
                 self.board.pk,
-            )
+            ),
         )
 
 
 class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
-    def post(self, request, board_pk, *args, **kwargs):
+    def post(self, request: HttpRequest, board_pk: int, *args, **kwargs):
         data = json.loads(request.body)
         order = data.get("order", [])
 
@@ -164,7 +173,16 @@ class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, generic.View):
 
 class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DetailView):
     model = Task
-    queryset = Task.objects.prefetch_related("blocking_tasks")
+    context_object_name = "task"
+    template_name = "flowdesk/task_detail.html"
+
+    def get_queryset(self):
+        return Task.objects.select_related("list", "created_by").prefetch_related(
+            "tags",
+            "assigned_to",
+            "blocking_tasks",
+            "comments__created_by",
+        )
 
 
 class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView):
@@ -173,10 +191,11 @@ class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateVie
 
     def get_success_url(self):
         return reverse(
-            "flowdesk:board-detail", args=(
+            "flowdesk:board-detail",
+            args=(
                 self.workspace.pk,
                 self.board.pk,
-            )
+            ),
         )
 
     def get_form_kwargs(self):
@@ -199,10 +218,11 @@ class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateVie
 
     def get_success_url(self):
         return reverse(
-            "flowdesk:board-detail", args=(
+            "flowdesk:board-detail",
+            args=(
                 self.workspace.pk,
                 self.board.pk,
-            )
+            ),
         )
 
     def get_form_kwargs(self):
@@ -217,10 +237,11 @@ class TaskDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteVie
 
     def get_success_url(self):
         return reverse(
-            "flowdesk:board-detail", args=(
+            "flowdesk:board-detail",
+            args=(
                 self.workspace.pk,
                 self.board.pk,
-            )
+            ),
         )
 
 
@@ -248,16 +269,18 @@ class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.CreateView
     form_class = TagForm
 
     def get_success_url(self):
-        return reverse(
-            "flowdesk:workspace-tags",
-            args=(
-                self.workspace.pk,
-            )
-        )
+        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
 
     def form_valid(self, form: TagForm) -> HttpResponse:
         form.instance.workspace = self.workspace
-        return super().form_valid(form)
+        try:
+            return super().form_valid(form)
+        except IntegrityError:
+            messages.warning(
+                self.request,
+                f"Tag '{form.instance.name}' already exists in this workspace.",
+            )
+            return HttpResponseRedirect(self.get_success_url())
 
 
 class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView):
@@ -265,21 +288,11 @@ class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, generic.UpdateView
     form_class = TagForm
 
     def get_success_url(self):
-        return reverse(
-            "flowdesk:workspace-tags",
-            args=(
-                self.workspace.pk,
-            )
-        )
+        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
 
 
 class TagDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, generic.DeleteView):
     model = Tag
 
     def get_success_url(self):
-        return reverse(
-            "flowdesk:workspace-tags",
-            args=(
-                self.workspace.pk,
-            )
-        )
+        return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))

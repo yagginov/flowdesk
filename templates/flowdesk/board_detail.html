@@ -36,6 +36,7 @@
                   data-task-id="{{ task.id }}">
                 <div class="card-body py-2 px-3">
                   {{ task.title }}
+                  <a href="{% url 'flowdesk:task-detail' board.workspace.pk board.pk list.pk task.pk %}" class="stretched-link"></a>
                 </div>
               </div>
             {% endfor %}
