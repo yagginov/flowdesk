@@ -1,10 +1,11 @@
+import json
+
 from django.http import HttpRequest, HttpResponse
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.db.models import Max, QuerySet
-
 
 from flowdesk.models import (
     Board,
@@ -131,3 +132,41 @@ class TaskCreateView(LoginRequiredMixin, generic.CreateView):
         last_position = list.tasks.aggregate(Max("position"))["position__max"]
         form.instance.position = (last_position or 0) + 1
         return super().form_valid(form)
+
+
+class ListOrderUpdate(LoginRequiredMixin, generic.View):
+    def post(self, request, board_id, *args, **kwargs):
+        data = json.loads(request.body)
+        order = data.get("order", [])
+
+        list_ids = [int(item["id"]) for item in order]
+        lists = List.objects.filter(pk__in=list_ids, board_id=board_id)
+
+        positions = {int(item["id"]): item["position"] for item in order}
+        for list in lists:
+            list.position = positions.get(list.id, list.position)
+
+        List.objects.bulk_update(objs=lists, fields=["position"])
+
+        return HttpResponse(status=204)
+
+
+class TaskOrderUpdate(LoginRequiredMixin, generic.View):
+    def post(self, request, board_id, *args, **kwargs):
+        data = json.loads(request.body)
+        moves = data.get("moves", [])
+
+        task_ids = [int(item["id"]) for item in moves]
+        tasks = Task.objects.filter(pk__in=task_ids, list__board_id=board_id)
+
+        moves_dict = {int(item["id"]): item for item in moves}
+
+        for task in tasks:
+            move = moves_dict.get(task.pk)
+            if move:
+                task.position = move["position"]
+                task.list_id = move["list"]
+
+        Task.objects.bulk_update(objs=tasks, fields=["position", "list_id"])
+
+        return HttpResponse(status=204)

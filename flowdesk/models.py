@@ -55,11 +55,6 @@ class List(models.Model):
 
     class Meta:
         ordering = ("position", )
-        constraints = (
-            models.UniqueConstraint(
-                fields=("board", "position"), name="unique_list_position_per_board"
-            ),
-        )
 
     def __str__(self) -> str:
         return self.name
@@ -104,9 +99,7 @@ class Task(models.Model):
 
     class Meta:
         ordering = (
-            "-priority",
-            "deadline",
-            "title",
+            "position",
         )
 
     def __str__(self) -> str:
