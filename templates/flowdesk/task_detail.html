@@ -132,6 +132,9 @@
           {% else %}
             <p class="text-muted">No blocking tasks</p>
           {% endif %}
+
+          <a href="{% url 'flowdesk:task-graph' task.list.board.workspace.pk task.list.board.pk task.list.pk task.pk %}" class="btn btn-secondary">Graph</a>
+          <a href="{% url 'flowdesk:board-detail' task.list.board.workspace.pk task.list.board.pk %}" class="btn btn-outline-secondary ms-2">Back to Board</a>
         </div>
       </div>
     </div>
