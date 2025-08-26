@@ -12,7 +12,7 @@ class LogerBaseModel(models.Model):
         abstract = True
 
 
-class WorkspaceMember(models.Model):
+class WorkspaceMember(LogerBaseModel):
     class Roles(models.TextChoices):
         OWNER = "OWNER", "Owner"
         ADMIN = "ADMIN", "Admin"

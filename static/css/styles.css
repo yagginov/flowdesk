@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 main {
@@ -61,9 +61,15 @@ main {
 }
 
 .card.card-list {
-  min-width: 200px;
-  max-width: 200px;
+  min-width: 250px;
+  max-width: 250px;
   flex: 0 0 auto;
+}
+
+.card-header .btn, 
+.card-header form {
+  position: relative;
+  z-index: 5;
 }
 
 .lists-wrapper {
@@ -103,4 +109,17 @@ main {
   background: #0d6efd;
   border-radius: 15px;
   cursor: grab;
+}
+
+.mb-3 input,
+.mb-3 select,
+.mb-3 textarea,
+.mb-3 .form-check select,
+.mb-3 .form-check input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.mb-3 .select2-container {
+  width: 100% !important;
 }

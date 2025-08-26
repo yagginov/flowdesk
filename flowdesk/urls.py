@@ -3,19 +3,30 @@ from django.urls import path
 from flowdesk.views import (
     IndexView,
     WorkspaceDetailView,
-    WorkspaceCreateView,
     WorkspaceMembersView,
     WorkspaceTagsView,
+    WorkspaceCreateView,
+    WorkspaceUpdateView,
+    WorkspaceDeleteView,
+    WorkspaceInviteView,
+    WorkspaceJoinView,
     TagCreateView,
     TagUpdateView,
     TagDeleteView,
     BoardDetailView,
     BoardCreateView,
+    BoardUpdateView,
+    BoardDeleteView,
     ListCreateView,
-    TaskCreateView,
-    TaskDetailView,
+    ListUpdateView,
+    ListDeleteView,
     ListOrderUpdate,
+    TaskDetailView,
+    TaskCreateView,
+    TaskUpdateView,
+    TaskDeleteView,
     TaskOrderUpdate,
+    CommentCreateView,
 )
 
 app_name = "flowdesk"
@@ -25,7 +36,6 @@ urlpatterns = [
     path(
         "workspaces/<int:pk>/", WorkspaceDetailView.as_view(), name="workspace-detail"
     ),
-    path("workspaces/create/", WorkspaceCreateView.as_view(), name="workspace-create"),
     path(
         "workspaces/<int:pk>/members/",
         WorkspaceMembersView.as_view(),
@@ -35,6 +45,27 @@ urlpatterns = [
         "workspaces/<int:pk>/tags/",
         WorkspaceTagsView.as_view(),
         name="workspace-tags",
+    ),
+    path("workspaces/create/", WorkspaceCreateView.as_view(), name="workspace-create"),
+    path(
+        "workspaces/<int:pk>/update/",
+        WorkspaceUpdateView.as_view(),
+        name="workspace-update",
+    ),
+    path(
+        "workspaces/<int:pk>/delete/",
+        WorkspaceDeleteView.as_view(),
+        name="workspace-delete",
+    ),
+    path(
+        "workspaces/<int:pk>/invite/",
+        WorkspaceInviteView.as_view(),
+        name="workspace-invite",
+    ),
+    path(
+        "workspaces/<int:pk>/join/<uidb64>/<token>/",
+        WorkspaceJoinView.as_view(),
+        name="workspace-join",
     ),
     path(
         "workspaces/<int:workspace_pk>/tags/create/",
@@ -56,21 +87,35 @@ urlpatterns = [
         BoardCreateView.as_view(),
         name="board-create",
     ),
-    path("workspaces/<int:workspace_pk>/boards/<int:pk>/", BoardDetailView.as_view(), name="board-detail"),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:pk>/update/",
+        BoardUpdateView.as_view(),
+        name="board-update",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:pk>/delete/",
+        BoardDeleteView.as_view(),
+        name="board-delete",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:pk>/",
+        BoardDetailView.as_view(),
+        name="board-detail",
+    ),
     path(
         "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/create/",
         ListCreateView.as_view(),
         name="list-create",
     ),
     path(
-        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/create/",
-        TaskCreateView.as_view(),
-        name="task-create",
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:pk>/update/",
+        ListUpdateView.as_view(),
+        name="list-update",
     ),
     path(
-        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:pk>/",
-        TaskDetailView.as_view(),
-        name="task-detail",
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:pk>/delete/",
+        ListDeleteView.as_view(),
+        name="list-delete",
     ),
     path(
         "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/order/",
@@ -78,8 +123,33 @@ urlpatterns = [
         name="update-list-order",
     ),
     path(
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:pk>/",
+        TaskDetailView.as_view(),
+        name="task-detail",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/create/",
+        TaskCreateView.as_view(),
+        name="task-create",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:pk>/update/",
+        TaskUpdateView.as_view(),
+        name="task-update",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:pk>/delete/",
+        TaskDeleteView.as_view(),
+        name="task-delete",
+    ),
+    path(
         "workspaces/<int:workspace_pk>/boards/<int:board_pk>/tasks/order/",
         TaskOrderUpdate.as_view(),
         name="update-task-order",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:task_pk>/comments/create/",
+        CommentCreateView.as_view(),
+        name="comment-create",
     ),
 ]

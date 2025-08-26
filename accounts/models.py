@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from versatileimagefield.fields import VersatileImageField
 
 
 class User(AbstractUser):
@@ -12,8 +13,8 @@ class Profile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile"
     )
-    avatar = models.ImageField(
-        null=True, blank=True, upload_to="accounts/profiles/avatars/"
+    avatar = VersatileImageField(
+        "avatar", upload_to="accounts/profiles/avatars/", blank=True, null=True
     )
     position = models.CharField(max_length=63)
 
