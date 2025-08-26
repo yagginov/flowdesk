@@ -22,6 +22,7 @@ from flowdesk.views import (
     ListDeleteView,
     ListOrderUpdate,
     TaskDetailView,
+    TaskGraphView,
     TaskCreateView,
     TaskUpdateView,
     TaskDeleteView,
@@ -126,6 +127,11 @@ urlpatterns = [
         "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:pk>/",
         TaskDetailView.as_view(),
         name="task-detail",
+    ),
+    path(
+        "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/<int:pk>/graph",
+        TaskGraphView.as_view(),
+        name="task-graph",
     ),
     path(
         "workspaces/<int:workspace_pk>/boards/<int:board_pk>/lists/<int:list_pk>/tasks/create/",

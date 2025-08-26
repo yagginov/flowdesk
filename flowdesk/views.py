@@ -41,6 +41,7 @@ from flowdesk.services.workspace_invite import (
     generate_invite_link,
     workspace_invite_token,
 )
+from flowdesk.services.task_graph import build_task_graph
 
 User = get_user_model()
 
@@ -457,6 +458,30 @@ class TaskOrderUpdate(
 
         Task.objects.bulk_update(objs=tasks, fields=["position", "list_id"])
         return HttpResponse(status=204)
+
+
+class TaskGraphView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.DetailView):
+    model = Task
+    template_name = "flowdesk/task_graph.html"
+
+    def get_queryset(self) -> QuerySet:
+        return Task.objects.filter(
+            list__board=self.board
+        ).select_related(
+            "list", "list__board"
+        ).prefetch_related(
+            "blocking_tasks", "tasks"
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        current_task = self.object
+
+        graph_data = build_task_graph(current_task, self.get_queryset(), self.workspace.pk, self.board.pk)
+        context["graph_data"] = json.dumps(graph_data)
+
+        return context
+
 
 
 class CommentCreateView(
