@@ -18,7 +18,9 @@ class RoleRequiredMixin:
         except WorkspaceMember.DoesNotExist:
             raise PermissionDenied("You are not a member of this workspace.")
         if not self.has_required_role(member.role):
-            raise PermissionDenied(f"You must have at least {self.required_role} role to perform this action.")
+            raise PermissionDenied(
+                f"You must have at least {self.required_role} role to perform this action."
+            )
         return super().dispatch(request, *args, **kwargs)
 
     def has_required_role(self, user_role):

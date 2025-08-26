@@ -50,9 +50,15 @@ class UserUpdateView(LoginRequiredMixin, generic.UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.POST:
-            context["profile_form"] = ProfileUpdateForm(self.request.POST, self.request.FILES, instance=self.request.user.profile)
+            context["profile_form"] = ProfileUpdateForm(
+                self.request.POST,
+                self.request.FILES,
+                instance=self.request.user.profile,
+            )
         else:
-            context["profile_form"] = ProfileUpdateForm(instance=self.request.user.profile)
+            context["profile_form"] = ProfileUpdateForm(
+                instance=self.request.user.profile
+            )
         return context
 
     def form_valid(self, form):

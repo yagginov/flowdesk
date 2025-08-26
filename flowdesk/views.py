@@ -28,16 +28,19 @@ from flowdesk.forms import (
     TaskForm,
     TagForm,
     CommentForm,
-    WorkspaceMemberFormSet
+    WorkspaceMemberFormSet,
 )
 from flowdesk.mixins import (
     WorkspaceAccessMixin,
     OwnerRequiredMixin,
     AdminRequiredMixin,
     UserRequiredMixin,
-    GuestRequiredMixin
+    GuestRequiredMixin,
 )
-from flowdesk.services.workspace_invite import generate_invite_link, workspace_invite_token
+from flowdesk.services.workspace_invite import (
+    generate_invite_link,
+    workspace_invite_token,
+)
 
 User = get_user_model()
 
@@ -46,7 +49,9 @@ class IndexView(LoginRequiredMixin, generic.TemplateView):
     template_name = "flowdesk/index.html"
 
 
-class WorkspaceDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
+class WorkspaceDetailView(
+    LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView
+):
     model = Workspace
     template_name = "flowdesk/workspace_detail.html"
 
@@ -54,7 +59,9 @@ class WorkspaceDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequire
         return Workspace.objects.prefetch_related("boards")
 
 
-class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
+class WorkspaceMembersView(
+    LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView
+):
     model = Workspace
     template_name = "flowdesk/workspace_members.html"
 
@@ -64,12 +71,16 @@ class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequir
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         workspace = self.get_object()
-        context['formset'] = WorkspaceMemberFormSet(queryset=workspace.memberships.all())
+        context["formset"] = WorkspaceMemberFormSet(
+            queryset=workspace.memberships.all()
+        )
         return context
 
     def post(self, request, *args, **kwargs):
         workspace = self.get_object()
-        formset = WorkspaceMemberFormSet(request.POST, queryset=workspace.memberships.all())
+        formset = WorkspaceMemberFormSet(
+            request.POST, queryset=workspace.memberships.all()
+        )
 
         if formset.is_valid():
             formset.save()
@@ -80,7 +91,9 @@ class WorkspaceMembersView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequir
         return redirect("flowdesk:workspace-members", pk=workspace.id)
 
 
-class WorkspaceInviteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DetailView):
+class WorkspaceInviteView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DetailView
+):
     model = Workspace
     template_name = "flowdesk/invite_link.html"
     pk_url_kwarg = "pk"
@@ -140,7 +153,9 @@ class WorkspaceJoinView(LoginRequiredMixin, generic.RedirectView):
         return reverse("flowdesk:index")
 
 
-class WorkspaceTagsView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
+class WorkspaceTagsView(
+    LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView
+):
     model = Workspace
     template_name = "flowdesk/workspace_tags.html"
 
@@ -163,18 +178,24 @@ class WorkspaceCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_valid(form)
 
 
-class WorkspaceUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
+class WorkspaceUpdateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView
+):
     model = Workspace
     form_class = WorkspaceForm
     success_url = reverse_lazy("flowdesk:index")
 
 
-class WorkspaceDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, OwnerRequiredMixin, generic.DeleteView):
+class WorkspaceDeleteView(
+    LoginRequiredMixin, WorkspaceAccessMixin, OwnerRequiredMixin, generic.DeleteView
+):
     model = Workspace
     success_url = reverse_lazy("flowdesk:index")
 
 
-class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView):
+class TagCreateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView
+):
     model = Tag
     form_class = TagForm
 
@@ -193,7 +214,9 @@ class TagCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin
             return HttpResponseRedirect(self.get_success_url())
 
 
-class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
+class TagUpdateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView
+):
     model = Tag
     form_class = TagForm
 
@@ -201,14 +224,18 @@ class TagUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin
         return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
 
 
-class TagDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
+class TagDeleteView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView
+):
     model = Tag
 
     def get_success_url(self):
         return reverse("flowdesk:workspace-tags", args=(self.workspace.pk,))
 
 
-class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
+class BoardDetailView(
+    LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView
+):
     model = Board
 
     def get_queryset(self) -> QuerySet:
@@ -217,7 +244,9 @@ class BoardDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMix
         )
 
 
-class BoardCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView):
+class BoardCreateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView
+):
     model = Board
     form_class = BoardForm
 
@@ -229,7 +258,9 @@ class BoardCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMix
         return super().form_valid(form)
 
 
-class BoardUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
+class BoardUpdateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView
+):
     model = Board
     form_class = BoardForm
 
@@ -237,14 +268,18 @@ class BoardUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMix
         return reverse("flowdesk:workspace-detail", args=(self.workspace.pk,))
 
 
-class BoardDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
+class BoardDeleteView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView
+):
     model = Board
 
     def get_success_url(self):
         return reverse("flowdesk:workspace-detail", args=(self.workspace.pk,))
 
 
-class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView):
+class ListCreateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.CreateView
+):
     model = List
     form_class = ListForm
 
@@ -264,7 +299,9 @@ class ListCreateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixi
         return super().form_valid(form)
 
 
-class ListUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView):
+class ListUpdateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.UpdateView
+):
     model = List
     form_class = ListForm
 
@@ -278,7 +315,9 @@ class ListUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixi
         )
 
 
-class ListDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView):
+class ListDeleteView(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.DeleteView
+):
     model = List
 
     def get_success_url(self):
@@ -291,7 +330,9 @@ class ListDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixi
         )
 
 
-class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.View):
+class ListOrderUpdate(
+    LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMixin, generic.View
+):
     def post(self, request: HttpRequest, board_pk: int, *args, **kwargs):
         data = json.loads(request.body)
         order = data.get("order", [])
@@ -307,7 +348,9 @@ class ListOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, AdminRequiredMix
         return HttpResponse(status=204)
 
 
-class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView):
+class TaskDetailView(
+    LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixin, generic.DetailView
+):
     model = Task
     context_object_name = "task"
     template_name = "flowdesk/task_detail.html"
@@ -326,7 +369,9 @@ class TaskDetailView(LoginRequiredMixin, WorkspaceAccessMixin, GuestRequiredMixi
         return context
 
 
-class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.CreateView):
+class TaskCreateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.CreateView
+):
     model = Task
     form_class = TaskForm
 
@@ -353,7 +398,9 @@ class TaskCreateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin
         return super().form_valid(form)
 
 
-class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.UpdateView):
+class TaskUpdateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.UpdateView
+):
     model = Task
     form_class = TaskForm
 
@@ -376,7 +423,9 @@ class TaskUpdateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin
         return kwargs
 
 
-class TaskDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.DeleteView):
+class TaskDeleteView(
+    LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.DeleteView
+):
     model = Task
 
     def get_success_url(self):
@@ -389,7 +438,9 @@ class TaskDeleteView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin
         )
 
 
-class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.View):
+class TaskOrderUpdate(
+    LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.View
+):
     def post(self, request, board_pk, *args, **kwargs):
         data = json.loads(request.body)
         moves = data.get("moves", [])
@@ -408,7 +459,9 @@ class TaskOrderUpdate(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixi
         return HttpResponse(status=204)
 
 
-class CommentCreateView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.CreateView):
+class CommentCreateView(
+    LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.CreateView
+):
     model = Comment
     form_class = CommentForm
 
