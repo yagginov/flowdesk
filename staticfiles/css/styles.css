@@ -1,0 +1,125 @@
+body {
+  margin: 0;
+  overflow: auto;
+}
+
+main {
+  padding: 20px;
+}
+
+#sidebar {
+  background: #212529;
+  height: 100%;
+  color: #fff;
+  width: 260px;
+  position: fixed;
+  z-index: 1; 
+  top: 0;
+  left: 0;
+}
+
+#sidebar .sidebar-title {
+  font-size: 1.7rem;
+  font-weight: bold;
+  color: #0d6efd;
+  letter-spacing: 1px;
+}
+
+#sidebar .btn-toggle {
+  color: #fff;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-weight: 500;
+  border: none;
+  padding: 0.75rem 1rem;
+  transition: background 0.2s;
+}
+
+#sidebar .btn-toggle[aria-expanded="true"],
+#sidebar .btn-toggle:hover {
+  background: #0d6efd;
+  color: #fff;
+}
+
+#sidebar .btn-toggle-nav a {
+  color: #adb5bd;
+  padding: 0.5rem 2rem;
+  display: block;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+#sidebar .btn-toggle-nav a:hover, #sidebar .btn-toggle-nav a.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+main {
+  margin-left: 260px;
+}
+
+.card.card-list {
+  min-width: 250px;
+  max-width: 250px;
+  flex: 0 0 auto;
+}
+
+.card-header .btn, 
+.card-header form {
+  position: relative;
+  z-index: 5;
+}
+
+.lists-wrapper {
+  width: calc(100vw - 320px);
+  position: relative;
+}
+
+.lists-scroll {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none;
+  align-items: flex-start;
+}
+
+.lists-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.lists-scrollbar {
+  --thumb-width: 80px;
+  position: fixed;
+  bottom: 20px;
+  left: 280px;
+  width: calc(100vw - 300px);
+  appearance: none;
+  height: 15px;
+  background: #dee2e6;
+  border-radius: 15px;
+  z-index: 1000;
+}
+
+.lists-scrollbar::-webkit-slider-thumb {
+  appearance: none;
+  width: var(--thumb-width);
+  height: 15px;
+  background: #0d6efd;
+  border-radius: 15px;
+  cursor: grab;
+}
+
+.mb-3 input,
+.mb-3 select,
+.mb-3 textarea,
+.mb-3 .form-check select,
+.mb-3 .form-check input {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.mb-3 .select2-container {
+  width: 100% !important;
+}

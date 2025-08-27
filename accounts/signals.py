@@ -17,9 +17,10 @@ def user_created_signal(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=Profile)
 def warm_Person_headshot_images(sender, instance, **kwargs):
-    person_img_warmer = VersatileImageFieldWarmer(
-        instance_or_queryset=instance,
-        rendition_key_set="avatar",
-        image_attr="avatar",
-    )
-    num_created, failed_to_create = person_img_warmer.warm()
+    if instance.avatar:
+        person_img_warmer = VersatileImageFieldWarmer(
+            instance_or_queryset=instance,
+            rendition_key_set="avatar",
+            image_attr="avatar",
+        )
+        num_created, failed_to_create = person_img_warmer.warm()
