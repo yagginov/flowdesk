@@ -3,6 +3,14 @@
 ## Short Description
 **Flowdesk** is a web application for organizing team collaboration, managing workspaces, boards, lists, tasks, and tags. The system allows you to create workspaces, invite members, assign roles, manage boards with tasks, comment, and track progress.
 
+deploy url: https://flowdesk-ppnu.onrender.com/
+
+test user:
+```
+username: user2
+password: xs24p7PPYSderAH
+```
+
 ## Features
 - Workspace management (create, update, delete, invite members)
 - Flexible role system (owner, admin, member, guest)
