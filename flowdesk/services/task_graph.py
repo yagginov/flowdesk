@@ -6,7 +6,9 @@ from django.urls import reverse
 from flowdesk.models import Task
 
 
-def build_task_graph(task: Task, queryset: QuerySet, workspace_pk: int, board_pk: int) -> dict:
+def build_task_graph(
+    task: Task, queryset: QuerySet, workspace_pk: int, board_pk: int
+) -> dict:
     visited = set()
     queue = deque([task])
     related_ids = set([task.pk])
@@ -42,20 +44,32 @@ def build_task_graph(task: Task, queryset: QuerySet, workspace_pk: int, board_pk
         else:
             group = "related"
 
-        nodes.append({
-            "id": t.pk,
-            "label": t.title,
-            "title": f"from list: {t.list.name}",
-            "group": group,
-            "url": reverse("flowdesk:task-detail", args=(workspace_pk, board_pk, t.list.pk, t.pk, )) 
-        })
+        nodes.append(
+            {
+                "id": t.pk,
+                "label": t.title,
+                "title": f"from list: {t.list.name}",
+                "group": group,
+                "url": reverse(
+                    "flowdesk:task-detail",
+                    args=(
+                        workspace_pk,
+                        board_pk,
+                        t.list.pk,
+                        t.pk,
+                    ),
+                ),
+            }
+        )
 
         for blocker in t.blocking_tasks.all():
             if blocker.pk in related_ids:
-                edges.append({
-                    "from": blocker.pk,
-                    "to": t.pk,
-                    "title": f"{blocker.title} → {t.title}"
-                })
+                edges.append(
+                    {
+                        "from": blocker.pk,
+                        "to": t.pk,
+                        "title": f"{blocker.title} → {t.title}",
+                    }
+                )
 
     return {"nodes": nodes, "edges": edges}

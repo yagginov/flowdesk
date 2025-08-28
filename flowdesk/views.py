@@ -460,28 +460,29 @@ class TaskOrderUpdate(
         return HttpResponse(status=204)
 
 
-class TaskGraphView(LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.DetailView):
+class TaskGraphView(
+    LoginRequiredMixin, WorkspaceAccessMixin, UserRequiredMixin, generic.DetailView
+):
     model = Task
     template_name = "flowdesk/task_graph.html"
 
     def get_queryset(self) -> QuerySet:
-        return Task.objects.filter(
-            list__board=self.board
-        ).select_related(
-            "list", "list__board"
-        ).prefetch_related(
-            "blocking_tasks", "tasks"
+        return (
+            Task.objects.filter(list__board=self.board)
+            .select_related("list", "list__board")
+            .prefetch_related("blocking_tasks", "tasks")
         )
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         current_task = self.object
 
-        graph_data = build_task_graph(current_task, self.get_queryset(), self.workspace.pk, self.board.pk)
+        graph_data = build_task_graph(
+            current_task, self.get_queryset(), self.workspace.pk, self.board.pk
+        )
         context["graph_data"] = json.dumps(graph_data)
 
         return context
-
 
 
 class CommentCreateView(
