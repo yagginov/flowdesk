@@ -28,3 +28,6 @@ db.sqlite3
 # Bytecode cache in nested dirs
 **/__pycache__/
 **/*.pyc
+
+# staticfiles
+staticfiles/

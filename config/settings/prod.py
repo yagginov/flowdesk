@@ -1,3 +1,5 @@
+import os
+
 from .base import *
 
 
@@ -19,3 +21,6 @@ DATABASES = {
         },
     }
 }
+
+# using default DropboxStorage class on prodaction
+STORAGES["default"]["BACKEND"] = "storages.backends.dropbox.DropboxStorage"
