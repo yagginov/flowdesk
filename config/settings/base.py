@@ -5,18 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.environ["SECRET_KEY"]
 
-ALLOWED_HOSTS = ["*"]
-
-debug_str = os.getenv("DEBUG")
-DEBUG = debug_str == "True" if debug_str else False
-
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+INTERNAL_IPS = []
 
 # Application definition
 
@@ -36,19 +29,12 @@ INSTALLED_APPS = [
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-
-
-VERSATILEIMAGEFIELD_RENDITION_KEY_SETS = {
-    "avatar": [
-        ("thumbnail", "crop__32x32"),
-        ("medium", "crop__128x128"),
-        ("large", "crop__300x300"),
-    ],
-}
+VERSATILEIMAGEFIELD_USE_CACHE = False
 
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -79,16 +65,6 @@ MESSAGE_STORAGE = "django.contrib.messages.storage.session.SessionStorage"
 
 
 WSGI_APPLICATION = "config.wsgi.application"
-
-
-# Database
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 
 
 # Password validation
@@ -123,7 +99,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = (BASE_DIR / "static",)
+STATICFILES_DIRS = (BASE_DIR / "static", )
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
@@ -136,10 +112,10 @@ LOGIN_REDIRECT_URL = "flowdesk:index"
 
 # email
 EMAIL_USE_TLS = True
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST = os.environ["EMAIL_HOST"]
+EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
+EMAIL_PORT = os.environ["EMAIL_PORT"]
 
 
 MEDIA_ROOT = BASE_DIR / "media/"
@@ -149,10 +125,10 @@ STORAGES = {
     "default": {
         "BACKEND": "base.storages.WindowsCompatibleDropboxStorage",
         "OPTIONS": {
-            "oauth2_access_token": os.getenv("DROPBOX_OAUTH2_TOKEN"),
-            "oauth2_refresh_token": os.getenv("DROPBOX_OAUTH2_REFRESH_TOKEN"),
-            "app_secret": os.getenv("DROPBOX_APP_SECRET"),
-            "app_key": os.getenv("DROPBOX_APP_KEY"),
+            "oauth2_access_token": os.environ["DROPBOX_OAUTH2_TOKEN"],
+            "oauth2_refresh_token": os.environ["DROPBOX_OAUTH2_REFRESH_TOKEN"],
+            "app_secret": os.environ["DROPBOX_APP_SECRET"],
+            "app_key": os.environ["DROPBOX_APP_KEY"],
             "root_path": "media/",
         },
     },

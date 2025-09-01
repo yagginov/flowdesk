@@ -1,0 +1,26 @@
+import os
+
+from .base import *
+
+
+DEBUG = False
+
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+ALLOWED_HOSTS = [RENDER_EXTERNAL_HOSTNAME]
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ["POSTGRES_DB"],
+        "USER": os.environ["POSTGRES_USER"],
+        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+        "HOST": os.environ["POSTGRES_HOST"],
+        "PORT": int(os.environ["POSTGRES_DB_PORT"]),
+        "OPTIONS": {
+            "sslmode": "require",
+        },
+    }
+}
+
+# using default DropboxStorage class on prodaction
+STORAGES["default"]["BACKEND"] = "storages.backends.dropbox.DropboxStorage"

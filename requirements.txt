@@ -11,6 +11,8 @@ django-storages==1.14.6
 django-versatileimagefield==3.1
 dotenv==0.9.9
 dropbox==12.0.2
+gunicorn==23.0.0
+h11==0.16.0
 idna==3.10
 libmagic==1.0
 mypy_extensions==1.1.0
@@ -19,9 +21,9 @@ pathspec==0.12.1
 pillow==11.3.0
 platformdirs==4.3.8
 ply==3.11
+psycopg2-binary==2.9.10
 python-dotenv==1.1.1
 python-magic==0.4.27
-python-magic-bin==0.4.14
 requests==2.32.5
 setuptools==80.9.0
 six==1.17.0
@@ -29,4 +31,6 @@ sqlparse==0.5.3
 stone==3.3.1
 tzdata==2025.2
 urllib3==2.5.0
+uvicorn==0.35.0
 wheel==0.45.1
+whitenoise==6.9.0
